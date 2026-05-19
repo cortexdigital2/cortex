@@ -18,7 +18,7 @@
   "dependencies": {
     "@clerk/clerk-js": "^6.8.0",
     "@posthog/react": "^1.9.0",
-    "@sentry/react": "^10.51.0",
+    "@sentry/react": "^10.53.1",
     "@supabase/supabase-js": "^2.106.0",
     "axios": "^1.16.0",
     "cors": "^2.8.6",
