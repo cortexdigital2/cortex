@@ -7,10 +7,10 @@ export const LOBOS = [
   {
     id: 1,
     nome: 'Analista Crítico',
-    modelo: 'deepseek/deepseek-r1-distill-llama-70b:free',
+    modelo: 'nousresearch/hermes-3-llama-3.1-405b:free',
     fallbacks: [
-      'meta-llama/llama-3.1-8b-instruct:free',
-      'qwen/qwen3-14b:free'
+      'meta-llama/llama-3.3-70b-instruct:free',
+      'openai/gpt-oss-120b:free',
     ],
     provider: 'openrouter',
     cor: '#ef4444',
@@ -18,10 +18,10 @@ export const LOBOS = [
   {
     id: 2,
     nome: 'Inovador Criativo',
-    modelo: 'google/gemma-3-12b-it:free',
+    modelo: 'google/gemma-4-31b-it:free',
     fallbacks: [
-      'meta-llama/llama-3.1-8b-instruct:free',
-      'qwen/qwen3-14b:free'
+      'google/gemma-4-26b-a4b-it:free',
+      'openai/gpt-oss-120b:free',
     ],
     provider: 'openrouter',
     cor: '#22c55e',
@@ -29,10 +29,10 @@ export const LOBOS = [
   {
     id: 3,
     nome: 'Pragmático Técnico',
-    modelo: 'microsoft/phi-4-reasoning-plus:free',
+    modelo: 'nvidia/nemotron-3-super-120b-a12b:free',
     fallbacks: [
-      'meta-llama/llama-3.1-8b-instruct:free',
-      'qwen/qwen3-14b:free'
+      'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free',
+      'openai/gpt-oss-120b:free',
     ],
     provider: 'openrouter',
     cor: '#3b82f6',
@@ -43,7 +43,7 @@ export const LOBOS = [
     modelo: 'openai/gpt-oss-120b:free',
     fallbacks: [
       'meta-llama/llama-3.3-70b-instruct:free',
-      'qwen/qwen3-14b:free'
+      'qwen/qwen3-next-80b-a3b-instruct:free',
     ],
     provider: 'openrouter',
     cor: '#eab308',
@@ -51,10 +51,10 @@ export const LOBOS = [
   {
     id: 5,
     nome: 'Advogado do Diabo',
-    modelo: 'qwen/qwen3-14b:free',
+    modelo: 'qwen/qwen3-coder:free',
     fallbacks: [
-      'meta-llama/llama-3.1-8b-instruct:free',
-      'google/gemma-3-12b-it:free'
+      'meta-llama/llama-3.3-70b-instruct:free',
+      'openai/gpt-oss-20b:free',
     ],
     provider: 'openrouter',
     cor: '#6b7280',

@@ -61,7 +61,7 @@ Devolve APENAS JSON sem markdown:
 
 const cacheJuizes = new Map();
 const CACHE_TTL = 10 * 60 * 1000;
-const JUDGE_TIMEOUT_MS = 8000;
+const JUDGE_TIMEOUT_MS = 25000;
 
 function textoDoLobe(lobe) {
   if (!lobe) return "";
@@ -238,7 +238,7 @@ async function chamarJuizComCache(juiz, pergunta, respostasLobos, signalExterno)
       signal: timeout.signal,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "google/gemma-3-27b-it:free",
+        model: "google/gemma-4-31b-it:free",
         system: juiz.systemPrompt,
         messages: [
           {
