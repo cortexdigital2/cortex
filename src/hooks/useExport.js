@@ -43,7 +43,7 @@ export async function exportarWord({ pergunta, lobos, veredicto }) {
 
 // Exportar Excel
 export async function exportarExcel({ pergunta, lobos, veredicto }) {
-  const XLSX = await import('xlsx');
+  const XLSX = await import('exceljs'); // TODO: API diferente, requer refactor
   const dados = [
     ['Pergunta', pergunta],
     [''],

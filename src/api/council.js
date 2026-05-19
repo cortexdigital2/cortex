@@ -768,6 +768,7 @@ no debate completo acima.
 Sê mais preciso e directo.`;
 }
 
+/** @deprecated Substituído pelo DAG cognitivo (runDagCognitivo). Remover no próximo sprint. */
 export async function runDebate(pergunta, modo = 'paralelo', options = {}) {
   const lobos = options.lobos || LOBOS;
   const chamar = options.chamarLobe || chamarLobe;
@@ -834,6 +835,7 @@ async function chamarStreamComFallback(lobe, pergunta, contextoDebate, chamarStr
   }
 }
 
+/** @deprecated Substituído pelo DAG cognitivo (runDagCognitivo). Remover no próximo sprint. */
 export async function runDebateStream(pergunta, modo = 'paralelo', options = {}) {
   const lobos = options.lobos || LOBOS;
   const chamarStream = options.chamarLobeStream || chamarLobeStream;

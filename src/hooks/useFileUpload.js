@@ -88,7 +88,7 @@ async function extrairDocx(file) {
 }
 
 async function extrairSheet(file) {
-  const XLSX = await import('xlsx');
+  const XLSX = await import('exceljs'); // TODO: API diferente, requer refactor
   const workbook = XLSX.read(await lerComoArrayBuffer(file), { type: 'array' });
   return workbook.SheetNames.map((nome) => {
     const csv = XLSX.utils.sheet_to_csv(workbook.Sheets[nome]);

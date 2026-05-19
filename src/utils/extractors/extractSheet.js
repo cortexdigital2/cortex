@@ -1,5 +1,5 @@
 // extractSheet.js — extrai conteúdo de ficheiros CSV e XLSX com SheetJS
-import * as XLSX from 'xlsx';
+import * as XLSX from 'exceljs'; // TODO: API diferente, requer refactor
 
 /**
  * Extrai conteúdo de ficheiro CSV ou XLSX como texto legível.

@@ -24,6 +24,7 @@
     "crypto-js": "^4.2.0",
     "docx": "^9.6.1",
     "dompurify": "^3.1.6",
+    "exceljs": "^4.4.0",
     "express": "^5.2.1",
     "express-rate-limit": "^8.5.0",
     "langfuse": "^3.38.20",
@@ -32,8 +33,7 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-swipeable": "^7.0.2",
-    "use-long-press": "^3.3.0",
-    "xlsx": "^0.18.5"
+    "use-long-press": "^3.3.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
