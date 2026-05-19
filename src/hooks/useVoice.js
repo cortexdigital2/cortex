@@ -96,12 +96,12 @@ export async function ouvirMicrofone(setInput, setAviso) {
     };
 
     mediaRecorder.start();
-    if (setAviso) setAviso("A ouvir (fala agora...)", "info");
-    
-    // Pára automaticamente após 5 segundos para simplificar a UX (não há botão de parar na UI original)
-    setTimeout(() => {
+    if (setAviso) setAviso("A ouvir... (toca novamente para parar)", "info");
+
+    // Retorna função de paragem para controlo manual pelo chamador
+    return () => {
       if (mediaRecorder.state === 'recording') mediaRecorder.stop();
-    }, 5000);
+    };
 
   } catch (err) {
     if (setAviso) setAviso("Acesso ao microfone negado", "error");
