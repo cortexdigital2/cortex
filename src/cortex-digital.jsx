@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import KingCard from './components/KingCard';
 import MessageList from './components/MessageList';
 import DebateTimeline from './components/DebateTimeline';
@@ -661,7 +661,29 @@ export default function Cortex(){
   const inputTokens = Math.round(inputChars / 4);
   const inputCounterWarn = inputChars > 2000;
 
-  useEffect(()=>{load();},[]);
+  const load = useCallback(async () => {
+    try{
+      const b  = await safeGet(MV+"-brain",  defaultBrain);
+      const m  = await safeGet(MV+"-msgs",   []);
+      const k  = await safeGet("cortex-keys-global", null) || await safeGet(MV+"-keys", defaultKeys);
+      const t  = await safeGet(MV+"-theme",  "cortex");
+      const mo = await safeGet(MV+"-models", null);
+      const temps = await safeGet(MV+"-temperaturas", null);
+      const convs = await safeGet(MV+"-convs", []);
+      setConversations(Array.isArray(convs) ? convs : []);
+      setBrain(normBrain(b));
+      setMsgs(Array.isArray(m)?m:[]);
+      setKeys({...defaultKeys,...(k&&typeof k==="object"?k:{})});
+      setTheme(typeof t==="string"&&THEMES[t]?t:"cortex");
+      setModelsOn(mo&&typeof mo==="object"?mo:Object.fromEntries(MODELS.map(x=>[x.id,true])));
+      setTemperaturas(temps&&typeof temps==="object"?{...Object.fromEntries(MODELS.map(x=>[x.id,0.7])),...temps}:Object.fromEntries(MODELS.map(x=>[x.id,0.7])));
+    }catch{
+      toast("Erro ao carregar ficheiro");
+    }
+    setLoaded(true);
+  }, [toast]);
+
+  useEffect(()=>{load();},[load]);
   useEffect(()=>{
     let cancelado = false;
     getUserId()
@@ -744,25 +766,6 @@ export default function Cortex(){
     if(showGuide || showModels || showTP || showSidebar || showBlueprintsPanel || showForensePanel) setFabOpen(false);
   },[showGuide,showModels,showTP,showSidebar,showBlueprintsPanel,showForensePanel]);
 
-  async function load(){
-    try{
-      const b  = await safeGet(MV+"-brain",  defaultBrain);
-      const m  = await safeGet(MV+"-msgs",   []);
-      const k  = await safeGet("cortex-keys-global", null) || await safeGet(MV+"-keys", defaultKeys);
-      const t  = await safeGet(MV+"-theme",  "cortex");
-      const mo = await safeGet(MV+"-models", null);
-      const temps = await safeGet(MV+"-temperaturas", null);
-      const convs = await safeGet(MV+"-convs", []);
-      setConversations(Array.isArray(convs) ? convs : []);
-      setBrain(normBrain(b));
-      setMsgs(Array.isArray(m)?m:[]);
-      setKeys({...defaultKeys,...(k&&typeof k==="object"?k:{})});
-      setTheme(typeof t==="string"&&THEMES[t]?t:"cortex");
-      setModelsOn(mo&&typeof mo==="object"?mo:Object.fromEntries(MODELS.map(x=>[x.id,true])));
-      setTemperaturas(temps&&typeof temps==="object"?{...Object.fromEntries(MODELS.map(x=>[x.id,0.7])),...temps}:Object.fromEntries(MODELS.map(x=>[x.id,0.7])));
-    }catch(e){toast("Erro ao carregar ficheiro");}
-    setLoaded(true);
-  }
 const saveConvs = c => safePut(MV+"-convs", c.slice(0,50));
   const saveBrain  = b  => safePut(MV+"-brain",  b);
   const saveMsgs   = m  => safePut(MV+"-msgs",   m.slice(-MAX_STORED));

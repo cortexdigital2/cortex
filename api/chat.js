@@ -93,7 +93,6 @@ export default async function handler(req, res) {
           res.setHeader("Connection", "keep-alive");
           
           const reader = upstream.body.getReader();
-          const decoder = new TextDecoder();
           
           while (true) {
             const { done, value } = await reader.read();
