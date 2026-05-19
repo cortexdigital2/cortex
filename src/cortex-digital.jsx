@@ -13,8 +13,10 @@ import MemoryBanner from './components/MemoryBanner.jsx';
 import Toast, { useToast } from './components/Toast.jsx';
 import FrustrationBanner from './components/FrustrationBanner.jsx';
 import CouncilGrid from './components/CouncilGrid.jsx';
+import MobileInput from './mobile/components/MobileInput.jsx';
 import useCouncil from './hooks/useCouncil';
 import { useAutoResize } from "./hooks/useAutoResize.js";
+import useMobile from "./hooks/useMobile.js";
 import { useStreaming } from "./hooks/useStreaming.js";
 import { ouvirMicrofone } from "./hooks/useVoice.js";
 import { LOBOS, runDebateStream as runDebateStreamApi, SYSTEM_PROMPTS_CODE } from "./api/council.js";
@@ -594,7 +596,7 @@ async function compressContext(buf, claudeKey, perpKey) {
 // ── COMPONENTE PRINCIPAL ─────────────────────────────────────────────────────
 export default function Cortex(){
   const [currentApprovalGate, setCurrentApprovalGate] = useState(null);
-  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
+  const { isMobile } = useMobile();
   const [brain,setBrain]     = useState(defaultBrain);
   const [msgs,setMsgs]       = useState([]);
   const { send: runCouncil, invoke: runInvoke, lobeResults, cacheSize, phase, setPhase, stopGeneration, isGenerating, frustrationLevel, setFrustrationLevel, guardarMemoriaSessao, getLastSessionContext, partialTexts } = useCouncil(msgs, setMsgs);
@@ -751,12 +753,6 @@ export default function Cortex(){
 
   // Bloqueio automático das chaves ao navegar para outra página
   useEffect(()=>{if(page!=="keys"&&!DEV_MODE)setDevUnlocked(false);},[page]);
-
-  useEffect(()=>{
-    const handler=()=>setIsMobile(window.innerWidth<768);
-    window.addEventListener("resize",handler);
-    return ()=>window.removeEventListener("resize",handler);
-  },[]);
 
   useEffect(()=>{
     if(!isMobile) setFabOpen(false);
@@ -1105,7 +1101,7 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
     <BlueprintsPanel onVoltar={() => setPagina('chat')} />
   );
   return (
-    <div style={{display:"flex",flexDirection:"column",height:"100dvh",background:T.bg,color:T.tx,fontFamily:"-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif",overflow:"hidden"}}>
+    <div style={{display:"flex",flexDirection:"column",height:"var(--app-height, 100dvh)",background:T.bg,color:T.tx,fontFamily:"-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif",overflow:"hidden"}}>
       <style>{`
   @keyframes orb{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.2;transform:scale(1.4)}}
   @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.2)}}
@@ -1583,7 +1579,7 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
       style={{
         position:"fixed",
         right:16,
-        bottom:`calc(16px + env(safe-area-inset-bottom))`,
+        bottom:isMobile ? `calc(96px + env(safe-area-inset-bottom))` : `calc(16px + env(safe-area-inset-bottom))`,
         zIndex:1201,
         width:56,
         height:56,
@@ -1606,7 +1602,7 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
   </>
 )}
 
-          <div ref={chatRef} onScroll={e=>{const el=e.currentTarget;setAtBottom(el.scrollHeight-el.scrollTop-el.clientHeight<60);}} style={{flex:1,overflowY:"auto",padding:"13px 12px 7px",position:"relative"}}>
+          <div ref={chatRef} onScroll={e=>{const el=e.currentTarget;setAtBottom(el.scrollHeight-el.scrollTop-el.clientHeight<60);}} style={{flex:1,overflowY:"auto",padding:`13px 12px ${isMobile ? "calc(80px + env(safe-area-inset-bottom))" : "7px"}`,position:"relative"}}>
             {mostrarMemoryBanner && (
               <MemoryBanner
                 onUsarContexto={usarContextoSessaoAnterior}
@@ -1689,12 +1685,13 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
                     </div>
                   </div>
                 )}
-                <div ref={botRef} style={{height:isMobile?96:44,scrollMarginBottom:isMobile?120:64}}/>
+                <div ref={botRef} style={{height:isMobile?80:44,scrollMarginBottom:isMobile?112:64}}/>
               </div>
             )}
           </div>
 
-          <div style={{padding:"8px 10px",paddingBottom:isMobile?"calc(72px + env(safe-area-inset-bottom))":"10px",background:T.s1,borderTop:`1px solid ${T.b2}`,flexShrink:0}}>
+          {!isMobile && (
+          <div style={{padding:"8px 10px",paddingBottom:"10px",background:T.s1,borderTop:`1px solid ${T.b2}`,flexShrink:0}}>
             <label style={{ fontSize:'0.85rem', color:'var(--text-muted)', display:'flex', alignItems:'center', gap:'6px', maxWidth:820, margin:'0 auto 6px' }}>
               <input
                 type="checkbox"
@@ -1823,6 +1820,17 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
             </div>
             {buf.length>0&&<div style={{fontSize:8,color:T.tf,textAlign:"center",marginTop:4}}>{`${buf.length} / ${MAX_BUF} tokens`}</div>}
           </div>
+          )}
+          {isMobile && (
+            <MobileInput
+              value={input}
+              inputRef={inputRef}
+              onChange={(valor)=>{setInput(valor);requestAnimationFrame(() => ajustar());}}
+              onSend={()=>{send();ajustar(true);}}
+              onStop={isGenerating ? stopGeneration : undefined}
+              disabled={!!phase}
+            />
+          )}
         </>
       )}
 
