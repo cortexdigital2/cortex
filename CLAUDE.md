@@ -79,9 +79,32 @@
 - `.claude/skills/cortex-digital` — skill principal do projeto
 - `.codex/` — contexto para Codex CLI
 
-## Roadmap Próximo
-- Persistência real com Supabase (substituir localStorage)
-- Conectores on-demand: Obsidian, Notion
-- Cloudflare: DNS + WAF + rate limiting + Turnstile
-- F5-01: RAG completo Qdrant
+## Fase 4 — Estado actual
+- F4-00: Routing dinâmico ✅
+- F4-01: Upload imagens Gemini ⏳
+- F4-02: Upload Universal ⏳
+- F4-03: Export Word/Excel/Notion ⏳
+- F4-04: Voz STT→debate→TTS ✅
+- F4-05: Citações inline Claude ✅
+- F4-06: Defesas prompt injection ✅
+- F4-07: Evals runner ✅ (HOJE)
+- F4-08: Multilinguismo PT real ⏳
+- F4-09: Melhoria automática pergunta ✅
+- F4-10: Compressão de contexto ✅
+
+Fase 4: 7/11 ✅
+
+## Segurança
+- xlsx removido → exceljs ✅
+- protobufjs audit fix ✅
+- UTF-8 encoding headers ✅
+- Mojibake cortex-digital.jsx ✅
+
+## Stack actual
+React + Vite | Vercel | Supabase | Qdrant
+OpenRouter | Claude 3.5/3.7 | Tavily | Stripe
+
+## Próximo: Fase 5
+- F5-01: RAG Qdrant
 - F5-02: Memória entre sessões
+- F5-03: Knowledge Graph

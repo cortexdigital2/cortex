@@ -1,0 +1,142 @@
+[
+  {
+    "id": "e01",
+    "pergunta": "O que é um PLC?",
+    "keywords_esperadas": ["Programmable", "controlador", "automação"],
+    "categoria": "industrial",
+    "dificuldade": "facil"
+  },
+  {
+    "id": "e02",
+    "pergunta": "Explica o papel de um sistema SCADA numa fábrica.",
+    "keywords_esperadas": ["supervisão", "aquisição", "dados", "interface", "HMI"],
+    "categoria": "industrial",
+    "dificuldade": "media"
+  },
+  {
+    "id": "e03",
+    "pergunta": "O que é o protocolo OPC-UA e qual a sua vantagem?",
+    "keywords_esperadas": ["interoperabilidade", "segurança", "comunicação", "plataforma"],
+    "categoria": "industrial",
+    "dificuldade": "media"
+  },
+  {
+    "id": "e04",
+    "pergunta": "Dá exemplos de sensores industriais e suas aplicações.",
+    "keywords_esperadas": ["temperatura", "pressão", "proximidade", "medição"],
+    "categoria": "industrial",
+    "dificuldade": "facil"
+  },
+  {
+    "id": "e05",
+    "pergunta": "Como funcionam os inversores de frequência (VFD)?",
+    "keywords_esperadas": ["motor", "velocidade", "frequência", "tensão", "energia"],
+    "categoria": "industrial",
+    "dificuldade": "media"
+  },
+  {
+    "id": "e06",
+    "pergunta": "O que são LLMs e como são treinados?",
+    "keywords_esperadas": ["Large Language Model", "transformer", "rede neuronal", "dados", "tokens"],
+    "categoria": "ia-geral",
+    "dificuldade": "facil"
+  },
+  {
+    "id": "e07",
+    "pergunta": "O que significa RAG (Retrieval-Augmented Generation)?",
+    "keywords_esperadas": ["Retrieval", "recuperação", "geração", "base de dados", "contexto", "vetores"],
+    "categoria": "ia-geral",
+    "dificuldade": "media"
+  },
+  {
+    "id": "e08",
+    "pergunta": "Como funcionam os embeddings de texto?",
+    "keywords_esperadas": ["vetores", "espaço", "semântica", "matemática", "dimensões", "distância"],
+    "categoria": "ia-geral",
+    "dificuldade": "dificil"
+  },
+  {
+    "id": "e09",
+    "pergunta": "O que é fine-tuning num modelo de linguagem?",
+    "keywords_esperadas": ["ajuste", "específico", "pesos", "treino", "tarefa"],
+    "categoria": "ia-geral",
+    "dificuldade": "media"
+  },
+  {
+    "id": "e10",
+    "pergunta": "Explica o conceito de temperatura na geração de texto de uma IA.",
+    "keywords_esperadas": ["criatividade", "aleatoriedade", "probabilidade", "determinismo", "tokens"],
+    "categoria": "ia-geral",
+    "dificuldade": "facil"
+  },
+  {
+    "id": "e11",
+    "pergunta": "O que são os Lobos no Córtex Digital?",
+    "keywords_esperadas": ["agentes", "modelos", "personalidades", "conselho", "perspectivas"],
+    "categoria": "cortex",
+    "dificuldade": "facil"
+  },
+  {
+    "id": "e12",
+    "pergunta": "Como funciona o debate multi-ronda (council) do Córtex?",
+    "keywords_esperadas": ["consenso", "rondas", "síntese", "rei", "convergência"],
+    "categoria": "cortex",
+    "dificuldade": "media"
+  },
+  {
+    "id": "e13",
+    "pergunta": "O que significa e como funciona o DAG (Directed Acyclic Graph) no Córtex?",
+    "keywords_esperadas": ["fluxo", "crítica", "unidirecional", "grafo", "fases", "alpha", "beta"],
+    "categoria": "cortex",
+    "dificuldade": "dificil"
+  },
+  {
+    "id": "e14",
+    "pergunta": "Qual o papel do Rei no conselho do Córtex?",
+    "keywords_esperadas": ["veredicto", "síntese", "decisão", "final", "juiz"],
+    "categoria": "cortex",
+    "dificuldade": "facil"
+  },
+  {
+    "id": "e15",
+    "pergunta": "Para que serve a métrica Sørensen-Dice no Córtex?",
+    "keywords_esperadas": ["consenso", "similaridade", "bigramas", "texto", "convergência"],
+    "categoria": "cortex",
+    "dificuldade": "media"
+  },
+  {
+    "id": "e16",
+    "pergunta": "Se eu tenho 3 maçãs e dou 1 ao João, depois compro mais 5, com quantas fico?",
+    "keywords_esperadas": ["7", "sete"],
+    "categoria": "raciocinio",
+    "dificuldade": "facil"
+  },
+  {
+    "id": "e17",
+    "pergunta": "O pai da Maria tem 5 filhas: Nana, Nene, Nini, Nono. Qual é o nome da quinta filha?",
+    "keywords_esperadas": ["Maria"],
+    "categoria": "raciocinio",
+    "dificuldade": "media"
+  },
+  {
+    "id": "e18",
+    "pergunta": "Se um comboio elétrico viaja para sul, para onde vai o fumo?",
+    "keywords_esperadas": ["nenhum", "elétrico", "não tem", "fumo"],
+    "categoria": "raciocinio",
+    "dificuldade": "facil"
+  },
+  {
+    "id": "e19",
+    "pergunta": "Resolve: 8 ÷ 2(2 + 2). Justifica a resposta segundo a ordem de operações (PEMDAS/BODMAS).",
+    "keywords_esperadas": ["16", "multiplicação", "divisão", "esquerda", "direita", "parênteses"],
+    "categoria": "raciocinio",
+    "dificuldade": "dificil"
+  },
+  {
+    "id": "e20",
+    "pergunta": "Qual é a sequência lógica: 2, 6, 12, 20, 30... O que se segue?",
+    "keywords_esperadas": ["42", "n(n+1)", "diferença", "crescente"],
+    "categoria": "raciocinio",
+    "dificuldade": "media"
+  }
+]
