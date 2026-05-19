@@ -1,21 +1,25 @@
-// extractSheet.js — extrai conteúdo de ficheiros CSV e XLSX com SheetJS
-import * as XLSX from 'xlsx';
+// extractSheet.js — extrai conteúdo de ficheiros XLSX com ExcelJS
+import ExcelJS from 'exceljs';
 
 /**
- * Extrai conteúdo de ficheiro CSV ou XLSX como texto legível.
+ * Extrai conteúdo de ficheiro XLSX como texto legível.
  * Cada folha é separada por linha vazia com cabeçalho.
- * @param {File} file — ficheiro CSV ou XLSX
+ * @param {File} file — ficheiro XLSX
  * @returns {Promise<string>} texto tabulado de todas as folhas
  */
 export async function extrairSheet(file) {
   const arrayBuffer = await file.arrayBuffer();
-  const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+  const workbook = new ExcelJS.Workbook();
+  await workbook.xlsx.load(arrayBuffer);
 
-  const partes = workbook.SheetNames.map(nomeFolha => {
-    const folha = workbook.Sheets[nomeFolha];
-    const csv = XLSX.utils.sheet_to_csv(folha, { skipHidden: true });
-    return `[Folha: ${nomeFolha}]\n${csv.trim()}`;
+  const partes = [];
+  workbook.eachSheet((worksheet) => {
+    let sheetCsv = [];
+    worksheet.eachRow((row) => {
+      sheetCsv.push(Array.isArray(row.values) ? row.values.slice(1).join(',') : Object.values(row.values).join(','));
+    });
+    partes.push(`[Folha: ${worksheet.name}]\n${sheetCsv.join('\n')}`);
   });
 
-  return partes.join('\n\n');
+  return partes.join('\n\n').trim();
 }

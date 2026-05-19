@@ -43,26 +43,31 @@ export async function exportarWord({ pergunta, lobos, veredicto }) {
 
 // Exportar Excel
 export async function exportarExcel({ pergunta, lobos, veredicto }) {
-  const XLSX = await import('xlsx');
-  const dados = [
-    ['Pergunta', pergunta],
-    [''],
-    ['Lobo', 'Resposta', 'Modelo', 'Confiança'],
-    ...lobos.map(l => [
+  const ExcelJS = await import('exceljs');
+  const wb = new ExcelJS.Workbook();
+  const ws = wb.addWorksheet('Córtex');
+
+  ws.addRow(['Pergunta', pergunta]);
+  ws.addRow([]);
+  ws.addRow(['Lobo', 'Resposta', 'Modelo', 'Confiança']);
+  lobos.forEach(l => {
+    ws.addRow([
       l.nome,
       l.resposta || '[sem resposta]',
       l.modelo || '',
       l.confianca != null ? `${l.confianca}%` : '',
-    ]),
-    [''],
-    ['Veredicto do Rei', veredicto || '[sem veredicto]'],
-  ];
+    ]);
+  });
+  ws.addRow([]);
+  ws.addRow(['Veredicto do Rei', veredicto || '[sem veredicto]']);
 
-  const wb = XLSX.utils.book_new();
-  const ws = XLSX.utils.aoa_to_sheet(dados);
-  ws['!cols'] = [{ wch: 20 }, { wch: 80 }, { wch: 30 }, { wch: 12 }];
-  XLSX.utils.book_append_sheet(wb, ws, 'Córtex');
-  XLSX.writeFile(wb, 'cortex-relatorio.xlsx');
+  ws.getColumn(1).width = 20;
+  ws.getColumn(2).width = 80;
+  ws.getColumn(3).width = 30;
+  ws.getColumn(4).width = 12;
+
+  const buffer = await wb.xlsx.writeBuffer();
+  descarregarFicheiro(buffer, 'cortex-relatorio.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 }
 
 // Exportar Notion (via proxy sem servidor)

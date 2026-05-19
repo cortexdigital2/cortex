@@ -88,12 +88,19 @@ async function extrairDocx(file) {
 }
 
 async function extrairSheet(file) {
-  const XLSX = await import('xlsx');
-  const workbook = XLSX.read(await lerComoArrayBuffer(file), { type: 'array' });
-  return workbook.SheetNames.map((nome) => {
-    const csv = XLSX.utils.sheet_to_csv(workbook.Sheets[nome]);
-    return `# ${nome}\n${csv}`;
-  }).join('\n\n').trim();
+  const ExcelJS = await import('exceljs');
+  const workbook = new ExcelJS.Workbook();
+  await workbook.xlsx.load(await lerComoArrayBuffer(file));
+  let result = [];
+  workbook.eachSheet((worksheet) => {
+    let sheetCsv = [];
+    worksheet.eachRow((row) => {
+      // row.values usually starts at index 1 in exceljs
+      sheetCsv.push(Array.isArray(row.values) ? row.values.slice(1).join(',') : Object.values(row.values).join(','));
+    });
+    result.push(`# ${worksheet.name}\n${sheetCsv.join('\n')}`);
+  });
+  return result.join('\n\n').trim();
 }
 
 async function extrairConteudo(file) {
@@ -108,10 +115,10 @@ async function extrairConteudo(file) {
     return { conteudo: texto, anotacoes };
   }
   if (ext === 'docx') return { conteudo: await extrairDocx(file) };
-  if (tipo === 'text/plain' || ext === 'txt' || ext === 'md') {
+  if (tipo === 'text/plain' || ext === 'txt' || ext === 'md' || ext === 'csv') {
     return { conteudo: (await lerComoTexto(file)).trim() };
   }
-  if (ext === 'csv' || ext === 'xlsx') return { conteudo: await extrairSheet(file) };
+  if (ext === 'xlsx') return { conteudo: await extrairSheet(file) };
   if (tipo.startsWith('audio/') || ext === 'mp3' || ext === 'wav') {
     return { conteudo: AUDIO_PLACEHOLDER };
   }
