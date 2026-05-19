@@ -17,10 +17,12 @@ import { detectFrustration } from "../utils/detectFrustration.js";
 import { classifyError } from "../utils/errorMessages.js";
 import { GENERATION_STATES } from "../utils/generationStates.js";
 import { trimHistory, HISTORY_LIMIT } from "../utils/trimHistory.js";
+import { queryMemories } from "../lib/memory.js";
 import {
   buildMemoryEntry,
   saveMemoryEntry,
   getLastSessionContext,
+  getLastSessionContextFromSupabase,
 } from "../utils/sessionMemory.js";
 
 // Cache curta de respostas dos lobos para evitar chamadas repetidas.
@@ -294,7 +296,7 @@ export default function useCouncil(msgs, setMsgs) {
     return stopRequestedRef.current || abortControllerRef.current?.signal?.aborted;
   }
 
-  const guardarMemoriaSessao = useCallback((historicoAnterior, conversationIdAnterior) => {
+  const guardarMemoriaSessao = useCallback(async (historicoAnterior, conversationIdAnterior, userId) => {
     if (!Array.isArray(historicoAnterior) || historicoAnterior.length === 0) return;
     const temUtilizador = historicoAnterior.some((m) => m.role === "user");
     const temAssistente = historicoAnterior.some((m) => m.role === "assistant");
@@ -304,7 +306,7 @@ export default function useCouncil(msgs, setMsgs) {
       historicoAnterior,
       conversationIdAnterior || `sessao-${Date.now()}`
     );
-    saveMemoryEntry(entry);
+    await saveMemoryEntry(userId, entry);
   }, []);
 
   async function invoke(id, sys, msg, ctx = {}) {
@@ -408,6 +410,7 @@ export default function useCouncil(msgs, setMsgs) {
       anexoUpload,
       imageDataUrl,
       systemPrompts,
+      userId,
     } = ctx;
 
     const q = (query || input).trim();
@@ -448,6 +451,30 @@ export default function useCouncil(msgs, setMsgs) {
 
     // Trunca o histórico enviado ao modelo (preserva estado local completo)
     const messagesParaEnviar = trimHistory(nm, HISTORY_LIMIT);
+
+    // RAG: Recuperação automática de contexto semântico do Supabase
+    let ragContext = "";
+    if (userId && userId !== "anon") {
+      try {
+        const ragHits = await queryMemories(userId, q, 0.45, 3);
+        if (ragHits && ragHits.length > 0) {
+          ragContext = ragHits
+            .map((hit) => `- [Semelhança: ${Math.round(hit.similarity * 100)}%]: "${hit.content}"`)
+            .join("\n");
+        }
+      } catch (e) {
+        console.warn("[useCouncil] RAG query falhou:", e.message);
+      }
+    }
+
+    if (ragContext) {
+      messagesParaEnviar.push({
+        id: `rag-context-${Date.now()}`,
+        role: "system",
+        content: `[Memória Semântica Histórica Recuperada via RAG]\nUse as seguintes informações históricas se forem úteis/relevantes para responder à pergunta atual do utilizador:\n${ragContext}`,
+        systemNote: true,
+      });
+    }
 
     const frLevel = detectFrustration(nm);
     setFrustrationLevel(frLevel);

@@ -1,8 +1,13 @@
 // Córtex Digital — Supabase memory layer
 // Todas as operações usam service key via proxy /api — nunca exposta no frontend
 
-const SB_URL = import.meta.env.VITE_SUPABASE_URL;
-const SB_ANON = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const SB_URL = typeof import.meta !== "undefined" && import.meta.env
+  ? import.meta.env.VITE_SUPABASE_URL
+  : (process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL);
+
+const SB_ANON = typeof import.meta !== "undefined" && import.meta.env
+  ? import.meta.env.VITE_SUPABASE_ANON_KEY
+  : (process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY);
 
 const MAX_SEMANTIC = 80;
 const MAX_PATTERNS = 12;
@@ -254,3 +259,18 @@ export async function getMemoryStats(userId) {
   }
   return res.json();
 }
+
+export async function getLastSessionSummary(userId) {
+  if (!userId || userId === "anon") return null;
+  try {
+    const path = `memories?user_id=eq.${encodeURIComponent(userId)}&order=created_at.desc&limit=50`;
+    const rows = await sbGet(path);
+    if (!rows || !rows.length) return null;
+    const sessionSummaries = rows.filter(r => r.metadata?.type === 'session_summary');
+    return sessionSummaries[0] || null;
+  } catch (e) {
+    console.warn("[memory] getLastSessionSummary falhou:", e.message);
+    return null;
+  }
+}
+

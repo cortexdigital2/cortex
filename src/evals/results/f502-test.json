@@ -1,0 +1,30 @@
+{
+  "test_date": "2026-05-19T23:58:51.931Z",
+  "status": "success",
+  "summary_persisted": true,
+  "context_retrieved": true,
+  "rag_query_works": true,
+  "db_state": [
+    {
+      "id": 1,
+      "user_id": "alexandre_evals_user",
+      "content": "Sessão da conversa com ID conversa-teste-123. Primeira pergunta do utilizador: \"Como programar um PLC S7-1200?\". Última pergunta do utilizador: \"Obrigado pelas dicas de automação.\". Resposta final dada pelo Córtex Digital: \"Disponha. Podes usar o TIA Portal para programar o PLC S7-1200.\".",
+      "metadata": {
+        "type": "session_summary",
+        "conversation_id": "conversa-teste-123",
+        "total_messages": 6,
+        "timestamp": "2026-05-19T23:58:51.909Z"
+      },
+      "created_at": "2026-05-19T23:58:51.910Z"
+    },
+    {
+      "id": 99,
+      "user_id": "alexandre_evals_user",
+      "content": "O protocolo OPC-UA é o padrão recomendado para comunicação industrial vertical.",
+      "metadata": {
+        "type": "user_note"
+      },
+      "created_at": "2026-05-19T23:58:51.931Z"
+    }
+  ]
+}

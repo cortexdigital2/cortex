@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import KingCard from './components/KingCard';
 import MessageList from './components/MessageList';
 import DebateTimeline from './components/DebateTimeline';
@@ -28,6 +28,7 @@ import {
   clearMemory,
   injectSessionContext,
   shouldShowMemoryBanner,
+  getLastSessionContextFromSupabase,
 } from "./utils/sessionMemory.js";
 
 const MV="cortex-v12";
@@ -740,20 +741,20 @@ export default function Cortex(){
   useEffect(()=>{
     if (!loaded) return;
     if (msgs.some((m)=>m.role==="user")) return;
-    setContextoSessaoAnterior(getLastSessionContext());
-  },[loaded, currentConvId, getLastSessionContext, msgs]);
+    getLastSessionContextFromSupabase(userId).then(setContextoSessaoAnterior);
+  },[loaded, currentConvId, msgs, userId]);
 
   useEffect(()=>{
     const guardarAntesDeSair = () => {
       const actual = sessionMemoryRef.current;
-      guardarMemoriaSessao(actual.msgs, actual.currentConvId);
+      guardarMemoriaSessao(actual.msgs, actual.currentConvId, userId);
     };
     window.addEventListener("beforeunload", guardarAntesDeSair);
     return () => {
       guardarAntesDeSair();
       window.removeEventListener("beforeunload", guardarAntesDeSair);
     };
-  },[guardarMemoriaSessao]);
+  },[guardarMemoriaSessao, userId]);
 
   // Bloqueio automÃ¡tico das chaves ao navegar para outra pÃ¡gina
   useEffect(()=>{if(page!=="keys"&&!DEV_MODE)setDevUnlocked(false);},[page]);
@@ -776,11 +777,11 @@ const saveConvs = c => safePut(MV+"-convs", c.slice(0,50));
 function newChat() {
   if (msgs.length>0) {
     autoSaveConv(msgs, currentConvId);
-    guardarMemoriaSessao(msgs, currentConvId);
+    guardarMemoriaSessao(msgs, currentConvId, userId);
   }
   setCurrentConvId(Date.now());
   setMsgs([]); saveMsgs([]); setBuf([]);
-  setContextoSessaoAnterior(getLastSessionContext());
+  getLastSessionContextFromSupabase(userId).then(setContextoSessaoAnterior);
   setMemoryBannerDismissed(false);
   setShowSidebar(false);
   setFrustrationDismissed(false);
@@ -790,7 +791,7 @@ function newChat() {
 function switchConv(conv) {
   if (msgs.length>0) {
     autoSaveConv(msgs, currentConvId);
-    guardarMemoriaSessao(msgs, currentConvId);
+    guardarMemoriaSessao(msgs, currentConvId, userId);
   }
   setMsgs(conv.msgs);
   setCurrentConvId(conv.id);
@@ -900,6 +901,7 @@ async function send(query, options = {}) {
   setFicheiroAnexado(null);
 
   const resultado = await runCouncil(qComFicheiro, {
+    userId,
     input,
     displayQuery: q,
     anexoUpload,
