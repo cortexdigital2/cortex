@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useLongPress } from 'use-long-press';
 import useHapticFeedback from '../hooks/useHapticFeedback.js';
@@ -21,6 +21,11 @@ export default function LongPressMenu({ children, onCopy, onShare, onFork, messa
   );
 
   const handleClose = () => setShowMenu(false);
+
+  // Cleanup: garante que o portal fecha se o componente desmontar com o menu aberto
+  useEffect(() => {
+    return () => setShowMenu(false);
+  }, []);
 
   // Portal Bottom Sheet
   const bottomSheet = showMenu ? createPortal(

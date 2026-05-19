@@ -5,6 +5,7 @@ import ChatBubble from "./ChatBubble";
 import { HISTORY_LIMIT } from "../utils/trimHistory";
 import SwipeableChatBubble from "../mobile/components/SwipeableChatBubble";
 import LongPressMenu from "../mobile/components/LongPressMenu";
+
 const GENERIC_ERROR_SUGGESTIONS = new Set([
   "Tenta reformular a pergunta",
   "Reporta o erro",
@@ -30,6 +31,7 @@ const MessageList = React.memo(function MessageList({
   toast,
   ClaudeCardComponent = ClaudeCard,
   BeforeVerdictComponent,
+  PainelSinteseComponent,
   textosParciais,
   aStreaming,
   onSuggestionClick = () => {},
@@ -51,8 +53,13 @@ const MessageList = React.memo(function MessageList({
     }
   };
 
+  // Fork: corta o histórico na mensagem seleccionada (PR #21 review Claude)
   const handleFork = (msg) => {
-    toast?.("Fork (Branching) em desenvolvimento.", "aviso");
+    const idx = msgs.findIndex((m) => m.id === msg.id);
+    if (idx !== -1) {
+      setMsgs(msgs.slice(0, idx));
+      toast?.("Fork criado — histórico cortado aqui", "sucesso");
+    }
   };
 
   const wrapMobileGestures = (contentNode, msg) => {
@@ -76,7 +83,7 @@ const MessageList = React.memo(function MessageList({
       {msgs.map((m, i) => {
         // Separador de contexto truncado
         const showContextSeparator = i === msgs.length - HISTORY_LIMIT && msgs.length > HISTORY_LIMIT;
-        
+
         const sugestoesRei = [
           ...(m.king?.suggestions || []),
           ...(m.sugestoes || []),
@@ -107,172 +114,173 @@ const MessageList = React.memo(function MessageList({
             )}
             <div
               key={`msg-${i}-${m.id || m.role || "sem-id"}`}
-          className="msg-in"
-          style={{
-            alignSelf: m.role === "user" ? "flex-end" : "stretch",
-            maxWidth: m.role === "user" ? "82%" : "100%",
-            display: "flex",
-            flexDirection: "column",
-            gap: 8,
-          }}
-        >
-          {m.role === "user" ? wrapMobileGestures((
-            <ChatBubble
-              papel="user"
-              cor={AC.claude}
-              meta={
-                m.complexity
-                  ? m.complexity === "SIMPLE"
-                    ? "⚡ Simples"
-                    : m.complexity === "MEDIUM"
-                    ? "⚙️ Médio"
-                    : "🧠 Complexo"
-                  : null
-              }
-            >
-              {m.anexo?.previewUrl && (
-                <img
-                  src={m.anexo.previewUrl}
-                  alt="Imagem anexada"
-                  style={{
-                    display: "block",
-                    maxWidth: "100%",
-                    maxHeight: 200,
-                    borderRadius: 8,
-                    marginBottom: 8,
-                    objectFit: "cover",
-                  }}
-                />
-              )}
-              {m.content}
-              {m.anexo && !m.anexo.previewUrl && (
-                <div
-                  style={{
-                    marginTop: 8,
-                    border: `1px solid ${AC.claude}33`,
-                    borderRadius: 10,
-                    padding: "6px 9px",
-                    fontSize: 11,
-                    color: T.ts,
-                  }}
-                >
-                  📎 {m.anexo.nome}
-                </div>
-              )}
-            </ChatBubble>
-          ), m) : m.systemNote ? (
-            <div
+              className="msg-in"
               style={{
-                alignSelf: "center",
-                fontSize: 10,
-                color: m.compressNote ? AC.perp : AC.claude,
-                background: m.compressNote ? `${AC.perp}12` : `${AC.claude}12`,
-                border: `1px solid ${m.compressNote ? AC.perp : AC.claude}22`,
-                borderRadius: 999,
-                padding: "6px 10px",
-                letterSpacing: 0.2,
+                alignSelf: m.role === "user" ? "flex-end" : "stretch",
+                maxWidth: m.role === "user" ? "82%" : "100%",
+                display: "flex",
+                flexDirection: "column",
+                gap: 8,
               }}
             >
-              {m.content}
-            </div>
-          ) : wrapMobileGestures((
-            <ClaudeCardView
-              m={m}
-              i={i}
-              msgs={msgs}
-              T={T}
-              AC={AC}
-              CopyBtn={CopyBtn}
-              Markdown={Markdown}
-              showCouncil={showCouncil}
-              setShowCouncil={setShowCouncil}
-              isMobile={isMobile}
-              toast={toast}
-              beforeVerdict={
-                BeforeVerdictComponent && m.modoDebate ? (
-                  <BeforeVerdictComponent
-                    ronda1={m.debate?.ronda1}
-                    ronda2={m.debate?.ronda2}
-                    ronda3={m.debate?.ronda3}
-                    modoDebate={m.modoDebate}
-                  />
-                ) : null
-              }
-            >
-              {/* Conselho expandido */}
-              {showCouncil === m.id && m.lobeResults?.length > 0 && (
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fit,minmax(280px,1fr))",
-                    alignItems: "start",
-                    gap: 10,
-                    paddingTop: 2,
-                  }}
+              {m.role === "user" ? wrapMobileGestures((
+                <ChatBubble
+                  papel="user"
+                  cor={AC.claude}
+                  meta={
+                    m.complexity
+                      ? m.complexity === "SIMPLE"
+                        ? "⚡ Simples"
+                        : m.complexity === "MEDIUM"
+                        ? "⚙️ Médio"
+                        : "🧠 Complexo"
+                      : null
+                  }
                 >
-                  {m.lobeResults.map((l, idx) => (
-                    <LobeCard
-                      key={`lobe-${l.id}-${idx}`}
-                      l={l}
-                      idx={idx}
-                      T={T}
-                      phase={phase}
-                      msgs={msgs}
-                      i={i}
-                      m={m}
-                      setPhase={setPhase}
-                      setMsgs={setMsgs}
-                      buildMem={buildMem}
-                      brain={brain}
-                      invoke={invoke}
-                      P={P}
-                      Markdown={Markdown}
-                      textosParciais={textosParciais}
-                      aStreaming={aStreaming}
-                    />
-                  ))}
-                </div>
-              )}
-              {sugestoesRei.length > 0 && (
-                <div
-                  style={{
-                    display: "inline-flex",
-                    gap: "8px",
-                    flexWrap: "wrap",
-                    marginTop: "8px",
-                  }}
-                >
-                  {sugestoesRei.map((sugestao, idx) => (
-                    <button
-                      key={`sugestao-rei-${m.id || i}-${idx}`}
-                      type="button"
-                      onClick={() => onSuggestionClick(sugestao)}
+                  {m.anexo?.previewUrl && (
+                    <img
+                      src={m.anexo.previewUrl}
+                      alt="Imagem anexada"
                       style={{
-                        border: "1px solid var(--accent)",
-                        borderRadius: "20px",
-                        padding: "4px 12px",
-                        fontSize: "13px",
-                        cursor: "pointer",
-                        background: "transparent",
-                        color: "var(--accent)",
-                        transition: "background 0.2s",
-                        fontFamily: "inherit",
+                        display: "block",
+                        maxWidth: "100%",
+                        maxHeight: 200,
+                        borderRadius: 8,
+                        marginBottom: 8,
+                        objectFit: "cover",
                       }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = "rgba(168,85,247,0.1)";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = "transparent";
+                    />
+                  )}
+                  {m.content}
+                  {m.anexo && !m.anexo.previewUrl && (
+                    <div
+                      style={{
+                        marginTop: 8,
+                        border: `1px solid ${AC.claude}33`,
+                        borderRadius: 10,
+                        padding: "6px 9px",
+                        fontSize: 11,
+                        color: T.ts,
                       }}
                     >
-                      {sugestao}
-                    </button>
-                  ))}
+                      📎 {m.anexo.nome}
+                    </div>
+                  )}
+                </ChatBubble>
+              ), m) : m.systemNote ? (
+                <div
+                  style={{
+                    alignSelf: "center",
+                    fontSize: 10,
+                    color: m.compressNote ? AC.perp : AC.claude,
+                    background: m.compressNote ? `${AC.perp}12` : `${AC.claude}12`,
+                    border: `1px solid ${m.compressNote ? AC.perp : AC.claude}22`,
+                    borderRadius: 999,
+                    padding: "6px 10px",
+                    letterSpacing: 0.2,
+                  }}
+                >
+                  {m.content}
                 </div>
-              )}
-            </ClaudeCardView>
-          ), m)}
-        </div>
+              ) : wrapMobileGestures((
+                <ClaudeCardView
+                  m={m}
+                  i={i}
+                  msgs={msgs}
+                  T={T}
+                  AC={AC}
+                  CopyBtn={CopyBtn}
+                  Markdown={Markdown}
+                  showCouncil={showCouncil}
+                  setShowCouncil={setShowCouncil}
+                  isMobile={isMobile}
+                  toast={toast}
+                  beforeVerdict={
+                    BeforeVerdictComponent && m.modoDebate ? (
+                      <BeforeVerdictComponent
+                        ronda1={m.debate?.ronda1}
+                        ronda2={m.debate?.ronda2}
+                        ronda3={m.debate?.ronda3}
+                        modoDebate={m.modoDebate}
+                      />
+                    ) : null
+                  }
+                  PainelSinteseComponent={PainelSinteseComponent}
+                >
+                  {/* Conselho expandido */}
+                  {showCouncil === m.id && m.lobeResults?.length > 0 && (
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fit,minmax(280px,1fr))",
+                        alignItems: "start",
+                        gap: 10,
+                        paddingTop: 2,
+                      }}
+                    >
+                      {m.lobeResults.map((l, idx) => (
+                        <LobeCard
+                          key={`lobe-${l.id}-${idx}`}
+                          l={l}
+                          idx={idx}
+                          T={T}
+                          phase={phase}
+                          msgs={msgs}
+                          i={i}
+                          m={m}
+                          setPhase={setPhase}
+                          setMsgs={setMsgs}
+                          buildMem={buildMem}
+                          brain={brain}
+                          invoke={invoke}
+                          P={P}
+                          Markdown={Markdown}
+                          textosParciais={textosParciais}
+                          aStreaming={aStreaming}
+                        />
+                      ))}
+                    </div>
+                  )}
+                  {sugestoesRei.length > 0 && (
+                    <div
+                      style={{
+                        display: "inline-flex",
+                        gap: "8px",
+                        flexWrap: "wrap",
+                        marginTop: "8px",
+                      }}
+                    >
+                      {sugestoesRei.map((sugestao, idx) => (
+                        <button
+                          key={`sugestao-rei-${m.id || i}-${idx}`}
+                          type="button"
+                          onClick={() => onSuggestionClick(sugestao)}
+                          style={{
+                            border: "1px solid var(--accent)",
+                            borderRadius: "20px",
+                            padding: "4px 12px",
+                            fontSize: "13px",
+                            cursor: "pointer",
+                            background: "transparent",
+                            color: "var(--accent)",
+                            transition: "background 0.2s",
+                            fontFamily: "inherit",
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.background = "rgba(168,85,247,0.1)";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.background = "transparent";
+                          }}
+                        >
+                          {sugestao}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </ClaudeCardView>
+              ), m)}
+            </div>
           </React.Fragment>
         );
       })}
