@@ -202,3 +202,55 @@ export async function triggerReflect(userId, buf, mem) {
     console.warn("[memory] triggerReflect falhou:", e.message);
   }
 }
+
+// ── RAG CLIENT METHODS (F5-01) ───────────────────────────────
+
+export async function upsertMemory(userId, content, metadata = {}) {
+  const res = await fetch('/api/memory/upsert', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ user_id: userId, content, metadata }),
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`RAG upsert falhou: ${err}`);
+  }
+  return res.json();
+}
+
+export async function queryMemories(userId, query, threshold = 0.5, limit = 3) {
+  const res = await fetch('/api/memory/query', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ user_id: userId, query, threshold, limit }),
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`RAG query falhou: ${err}`);
+  }
+  return res.json();
+}
+
+export async function deleteMemory(userId, id = null) {
+  const res = await fetch('/api/memory/delete', {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ user_id: userId, id }),
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`RAG delete falhou: ${err}`);
+  }
+  return res.json();
+}
+
+export async function getMemoryStats(userId) {
+  const res = await fetch(`/api/memory/stats?user_id=${encodeURIComponent(userId)}`, {
+    method: 'GET',
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`RAG stats falhou: ${err}`);
+  }
+  return res.json();
+}

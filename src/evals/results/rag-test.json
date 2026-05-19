@@ -1,0 +1,90 @@
+{
+  "test_date": "2026-05-19T23:46:42.341Z",
+  "status": "success",
+  "total_documents": 3,
+  "insertions": [
+    {
+      "content": "Automação industrial com PLC permite controle robusto de processos.",
+      "status": "sucesso",
+      "latency_ms": 189
+    },
+    {
+      "content": "LLMs e RAG melhoram as respostas dos chatbots com contexto relevante.",
+      "status": "sucesso",
+      "latency_ms": 158
+    },
+    {
+      "content": "O conselho do Córtex Digital usa múltiplos lobos para tomada de decisão.",
+      "status": "sucesso",
+      "latency_ms": 76
+    }
+  ],
+  "queries": [
+    {
+      "query": "Como controlar processos industriais?",
+      "latency_ms": 78,
+      "results": [
+        {
+          "id": 3,
+          "content": "O conselho do Córtex Digital usa múltiplos lobos para tomada de decisão.",
+          "metadata": {
+            "tag": "cortex"
+          },
+          "similarity": 0.9339850074885644
+        },
+        {
+          "id": 2,
+          "content": "LLMs e RAG melhoram as respostas dos chatbots com contexto relevante.",
+          "metadata": {
+            "tag": "ia"
+          },
+          "similarity": 0.40693759298532256
+        }
+      ]
+    },
+    {
+      "query": "Como funciona o Córtex Digital?",
+      "latency_ms": 74,
+      "results": [
+        {
+          "id": 3,
+          "content": "O conselho do Córtex Digital usa múltiplos lobos para tomada de decisão.",
+          "metadata": {
+            "tag": "cortex"
+          },
+          "similarity": 0.9951744401116829
+        },
+        {
+          "id": 2,
+          "content": "LLMs e RAG melhoram as respostas dos chatbots com contexto relevante.",
+          "metadata": {
+            "tag": "ia"
+          },
+          "similarity": 0.15140562412739508
+        }
+      ]
+    },
+    {
+      "query": "O que melhora as respostas das IAs?",
+      "latency_ms": 77,
+      "results": [
+        {
+          "id": 3,
+          "content": "O conselho do Córtex Digital usa múltiplos lobos para tomada de decisão.",
+          "metadata": {
+            "tag": "cortex"
+          },
+          "similarity": 0.8556447873543858
+        },
+        {
+          "id": 2,
+          "content": "LLMs e RAG melhoram as respostas dos chatbots com contexto relevante.",
+          "metadata": {
+            "tag": "ia"
+          },
+          "similarity": 0.5627521572711662
+        }
+      ]
+    }
+  ]
+}
