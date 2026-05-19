@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { formatLobeResponse } from '../utils/formatLobe.js';
 
 // pairingMap: prop reservada para v2 — setas visuais de crítica entre lobos
 
@@ -49,7 +50,7 @@ export default function CouncilGrid({
 
   const getPreview = (res, txt, lobo) => {
     const base = txt || res?.ronda3 || res?.ronda2 || res?.ronda1 || res?.result || '';
-    if (base) return base;
+    if (base) return formatLobeResponse(base);
     return `Aguardando ${lobo.nome?.split(' ')?.[0] || 'lobo'}...`;
   };
 
@@ -57,7 +58,7 @@ export default function CouncilGrid({
     const resposta = txt || res?.result || res?.ronda3 || res?.ronda2 || res?.ronda1 || '';
     setSelecionado({
       ...lobo,
-      resposta,
+      resposta: formatLobeResponse(resposta),
       estado,
       latency: res?.latency ?? null,
       confidence: res?.confidence ?? null,

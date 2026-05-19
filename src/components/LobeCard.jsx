@@ -2,6 +2,7 @@ import React from "react";
 import ChatBubble from "./ChatBubble";
 import ErrorMessage from "./ErrorMessage.jsx";
 import LobeLoader from "./LobeLoader";
+import { formatLobeResponse } from "../utils/formatLobe.js";
 
 const LobeCard = React.memo(function LobeCard({
   l,
@@ -23,7 +24,8 @@ const LobeCard = React.memo(function LobeCard({
 }) {
   const streamKey = l.streamId ?? l.id;
   const textoParcial = textosParciais?.[streamKey] || textosParciais?.[l.id] || "";
-  const respostaVisivel = textoParcial || l.result || "";
+  const respostaBruta = textoParcial || l.result || "";
+  const respostaVisivel = formatLobeResponse(respostaBruta);
   const corLobe = l.color || l.cor || "#10b981";
   const nomeLobe = l.label || l.nome || l.id || "Lobo";
 
@@ -227,7 +229,7 @@ const LobeCard = React.memo(function LobeCard({
           <ErrorMessage error={`${nomeLobe} falhou — a usar reserva quando disponível.`} />
         )}
 
-        {l.regenerating || (!respostaVisivel && aStreaming) ? (
+        {l.regenerating || (!respostaBruta && aStreaming) ? (
           <LobeLoader cor={corLobe} texto="A pensar..." />
         ) : (
           <ChatBubble papel="assistant" nome={nomeLobe} cor={corLobe}>
