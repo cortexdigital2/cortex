@@ -61,6 +61,11 @@ export const LOBOS = [
   },
 ];
 
+export const BETA_DAG = [
+  { revisorId: 1, alvoIds: [2, 4] },
+  { revisorId: 5, alvoIds: [3, 1] },
+];
+
 
 
 export const SYSTEM_PROMPTS = {
@@ -286,6 +291,134 @@ function opcoesGeracaoLobe(lobe, options = {}) {
   return Number.isFinite(Number(temperatura)) ? { temperature: Number(temperatura) } : {};
 }
 
+function textoParaConsenso(item) {
+  return String(item?.conteudo || item?.resposta || item?.result || '').trim();
+}
+
+function normalizarTextoConsenso(texto) {
+  return String(texto || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^\p{L}\p{N}\s]/gu, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function bigramas(texto) {
+  const normalizado = normalizarTextoConsenso(texto);
+  if (!normalizado) return [];
+  if (normalizado.length < 2) return [normalizado];
+
+  const pares = [];
+  for (let i = 0; i < normalizado.length - 1; i += 1) {
+    pares.push(normalizado.slice(i, i + 2));
+  }
+  return pares;
+}
+
+function scoreSorensenDice(textoA, textoB) {
+  const a = bigramas(textoA);
+  const b = bigramas(textoB);
+  if (!a.length || !b.length) return 0;
+
+  const contagem = new Map();
+  a.forEach((par) => contagem.set(par, (contagem.get(par) || 0) + 1));
+
+  let interseccao = 0;
+  b.forEach((par) => {
+    const actual = contagem.get(par) || 0;
+    if (actual > 0) {
+      interseccao += 1;
+      contagem.set(par, actual - 1);
+    }
+  });
+
+  return (2 * interseccao) / (a.length + b.length);
+}
+
+export function calcularConsensoPreliminar(resultadosAlpha = []) {
+  const textos = (Array.isArray(resultadosAlpha) ? resultadosAlpha : [])
+    .filter((item) => item?.sucesso !== false)
+    .map(textoParaConsenso)
+    .filter(Boolean);
+
+  if (textos.length < 2) return 0;
+
+  let total = 0;
+  let pares = 0;
+  for (let i = 0; i < textos.length; i += 1) {
+    for (let j = i + 1; j < textos.length; j += 1) {
+      total += scoreSorensenDice(textos[i], textos[j]);
+      pares += 1;
+    }
+  }
+
+  return Math.round((total / Math.max(1, pares)) * 100);
+}
+
+export function extrairTelemetriaOpenRouter(dados, tempoMs = null, cacheStatus = null) {
+  const totalTokens = Number(dados?.usage?.total_tokens);
+  return {
+    tempo_ms: Number.isFinite(Number(tempoMs)) ? Number(tempoMs) : null,
+    total_tokens: Number.isFinite(totalTokens) ? totalTokens : null,
+    cache_status: cacheStatus || null,
+  };
+}
+
+function lobosEmFalha(resultadosAlpha = [], resultadosBeta = []) {
+  return [...resultadosAlpha, ...resultadosBeta]
+    .filter((item) => item?.sucesso === false)
+    .map((item) => item.lobo)
+    .filter(Boolean)
+    .filter((nome, index, lista) => lista.indexOf(nome) === index);
+}
+
+export function construirPayloadOmega({ resultadosAlpha = [], resultadosBeta = [], tempoMs = 0 } = {}) {
+  return {
+    conselho_metadata: {
+      score_consenso_pct: calcularConsensoPreliminar(resultadosAlpha),
+      lobos_em_falha: lobosEmFalha(resultadosAlpha, resultadosBeta),
+      tempo_ms: Math.max(0, Math.round(Number(tempoMs) || 0)),
+    },
+    fase_alpha: resultadosAlpha,
+    fase_beta: resultadosBeta,
+  };
+}
+
+export function construirSystemPromptOmega(resultadosAlpha = [], resultadosBeta = []) {
+  const lobosValidos = (Array.isArray(resultadosAlpha) ? resultadosAlpha : [])
+    .filter((item) => item?.sucesso !== false && item?.lobo)
+    .map((item) => `[${item.lobo}]`);
+  const falhas = lobosEmFalha(resultadosAlpha, resultadosBeta);
+
+  return `<role>Claude, Rei sintético do Córtex Digital</role>
+<mission>Transforma o JSON Ómega num veredicto final útil, auditável e accionável.</mission>
+<contexto>
+Lobos válidos para citação: ${lobosValidos.join(', ') || 'nenhum'}.
+Lobos em falha: ${falhas.join(', ') || 'nenhum'} — ignora automaticamente estes conteúdos.
+</contexto>
+<rules>
+- Responde em PT-PT.
+- Cita sempre pelo menos um lobo no formato exacto [Nome do Lobo], por exemplo ${lobosValidos[0] || '[Lobe X]'}.
+- Usa apenas lobos com sucesso=true. Nunca cites lobos_em_falha.
+- Considera a Fase Beta como crítica unidireccional; não inventes tréplicas.
+- Devolve sempre 3 chips de resposta rápida em "suggestions".
+- O veredicto deve ser directo, com decisão e próximos passos.
+</rules>
+Devolve APENAS JSON válido:
+{
+  "raciocinio": ["1-3 frases curtas com citações [Lobe X]"],
+  "veredicto": "resposta final com citações inline [Lobe X]",
+  "confianca_lobos": 0,
+  "confianca_juizes": null,
+  "confianca_final": 0,
+  "admite_incerteza": false,
+  "razao_incerteza": null,
+  "suggestions": ["chip 1", "chip 2", "chip 3"]
+}`.trim();
+}
+
 // Lobos que usam web search via ferramenta de servidor OpenRouter.
 // ATENÇÃO: cada chamada com web search tem custo ~$0.02 (via Exa),
 // mesmo nos modelos :free. Activa apenas onde dados externos são críticos.
@@ -335,6 +468,7 @@ export async function chamarLobe(lobe, pergunta, contextoDebate = null, options 
           ...geracao,
         };
 
+  const inicio = Date.now();
   const resposta = await fetch(
     lobe.provider === 'nim' ? getBaseURL(lobe.provider) : '/api/chat',
     {
@@ -368,7 +502,14 @@ export async function chamarLobe(lobe, pergunta, contextoDebate = null, options 
     dados.choices?.[0]?.message?.tool_calls?.[0]?.function?.arguments ||
     dados.content ||
     '';
-  return normalizarValorLobe(lobe, { resposta: texto }, contextoDebate);
+  return normalizarValorLobe(
+    lobe,
+    {
+      resposta: texto,
+      telemetria: extrairTelemetriaOpenRouter(dados, Date.now() - inicio, cacheStatus),
+    },
+    contextoDebate,
+  );
 }
 
 export async function chamarLobeStream(lobe, pergunta, contextoDebate = null, options = {}) {
@@ -456,7 +597,9 @@ async function chamarComMapa(lobe, pergunta, contextoDebate, mapa, chamar, optio
   const abortarPorPai = () => ctrl.abort();
   if (options.signal?.aborted) ctrl.abort();
   else options.signal?.addEventListener?.('abort', abortarPorPai, { once: true });
-  mapa.set(lobe.id, ctrl);
+  const destinoMapa = options.controllersMap || mapa;
+  const chaveMapa = `${options.controllerPrefix || ''}${lobe.id}`;
+  destinoMapa.set(chaveMapa, ctrl);
   try {
     const valor = await chamar(lobe, pergunta, contextoDebate, {
       ...options,
@@ -466,8 +609,141 @@ async function chamarComMapa(lobe, pergunta, contextoDebate, mapa, chamar, optio
     return normalizarValorLobe(lobe, valor, contextoDebate);
   } finally {
     options.signal?.removeEventListener?.('abort', abortarPorPai);
-    if (mapa.get(lobe.id) === ctrl) mapa.delete(lobe.id);
+    if (destinoMapa.get(chaveMapa) === ctrl) destinoMapa.delete(chaveMapa);
   }
+}
+
+function resultadoAlpha(lobe, settled) {
+  if (settled?.status === 'fulfilled') {
+    const valor = settled.value || {};
+    return {
+      lobo: valor.nome || lobe.nome,
+      modelo: valor.modelo || lobe.modelo,
+      sucesso: true,
+      conteudo: valor.resposta || '',
+      telemetria: valor.telemetria || { tempo_ms: valor.latency || null, total_tokens: null },
+    };
+  }
+
+  return {
+    lobo: lobe.nome,
+    modelo: lobe.modelo,
+    sucesso: false,
+    conteudo: settled?.reason?.message || 'Lobo indisponível.',
+    telemetria: { tempo_ms: null, total_tokens: null },
+  };
+}
+
+function resultadoBeta(revisor, alvoIds, lobos, settled) {
+  const alvos_criticados = alvoIds
+    .map((id) => lobos.find((lobe) => lobe.id === id)?.nome)
+    .filter(Boolean);
+
+  if (settled?.status === 'fulfilled') {
+    const valor = settled.value || {};
+    return {
+      lobo: valor.nome || revisor.nome,
+      alvos_criticados,
+      sucesso: true,
+      conteudo: valor.resposta || '',
+      telemetria: valor.telemetria || { tempo_ms: valor.latency || null, total_tokens: null },
+    };
+  }
+
+  return {
+    lobo: revisor.nome,
+    alvos_criticados,
+    sucesso: false,
+    conteudo: settled?.reason?.message || 'Crítica indisponível.',
+    telemetria: { tempo_ms: null, total_tokens: null },
+  };
+}
+
+function contextoBeta(pergunta, revisor, alvoIds, lobos, faseAlpha) {
+  const linhasAlvos = alvoIds.map((id) => {
+    const lobe = lobos.find((item) => item.id === id);
+    const alpha = faseAlpha.find((item) => item.lobo === lobe?.nome);
+    const conteudo = alpha?.sucesso ? alpha.conteudo : 'sem resposta válida';
+    return `[${lobe?.nome || `Lobo ${id}`}]: ${conteudo}`;
+  });
+
+  return `FASE BETA — crítica cruzada unidireccional.
+Revisor: [${revisor.nome}]
+Pergunta original: ${pergunta}
+
+Critica APENAS estes alvos:
+${linhasAlvos.join('\n\n')}
+
+Regras:
+- Uma única ronda, sem tréplica.
+- Aponta falhas, riscos e omissões.
+- Não reescrevas a tua resposta Alpha; responde como revisor Beta.
+- Cita os alvos pelo nome.`;
+}
+
+export async function runDagCognitivo(pergunta, options = {}) {
+  const inicio = Date.now();
+  const lobos = (options.lobos || LOBOS).slice(0, 5);
+  const chamar = options.chamarLobe || chamarLobe;
+  const mapaAlpha = new Map();
+  const mapaBeta = new Map();
+  const { imageDataUrl, ...optionsSemImagem } = options;
+  const optionsAlpha = imageDataUrl ? { ...optionsSemImagem, imageDataUrl } : optionsSemImagem;
+
+  options.onPhase?.('geracao');
+  const rondaAlpha = await Promise.allSettled(
+    lobos.map((lobe) =>
+      chamarComMapa(lobe, pergunta, null, mapaAlpha, chamar, {
+        ...optionsAlpha,
+        controllerPrefix: 'alpha:',
+      })
+    )
+  );
+
+  const fase_alpha = lobos.map((lobe, index) => resultadoAlpha(lobe, rondaAlpha[index]));
+  options.onAlpha?.(fase_alpha, rondaAlpha);
+
+  options.onPhase?.('critica');
+  const revisores = BETA_DAG
+    .map((item) => ({
+      ...item,
+      revisor: lobos.find((lobe) => lobe.id === item.revisorId),
+    }))
+    .filter((item) => item.revisor);
+
+  const rondaBeta = await Promise.allSettled(
+    revisores.map((item) =>
+      chamarComMapa(
+        item.revisor,
+        pergunta,
+        contextoBeta(pergunta, item.revisor, item.alvoIds, lobos, fase_alpha),
+        mapaBeta,
+        chamar,
+        {
+          ...optionsSemImagem,
+          controllerPrefix: 'beta:',
+        }
+      )
+    )
+  );
+
+  const fase_beta = revisores.map((item, index) =>
+    resultadoBeta(item.revisor, item.alvoIds, lobos, rondaBeta[index])
+  );
+
+  const payload_omega = construirPayloadOmega({
+    resultadosAlpha: fase_alpha,
+    resultadosBeta: fase_beta,
+    tempoMs: Date.now() - inicio,
+  });
+
+  return {
+    ronda1: rondaAlpha,
+    ronda2: rondaBeta,
+    fase_alpha,
+    fase_beta,
+    payload_omega,
+  };
 }
 
 export function calcularScoreConsenso(ronda1 = [], ronda2 = []) {

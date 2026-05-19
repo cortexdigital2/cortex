@@ -256,7 +256,7 @@ function normalizarResultadoRei(parseado, consensoMatematico, scoreJuizesMedio, 
 // FALLBACK PAGO — só em falha do Rei principal.
 // Fusion usa Claude Opus + GPT internamente; activa apenas quando Llama 3.3 falha ou devolve vazio.
 const JUIZ_FALLBACK = {
-  modelo: "openrouter/fusion",
+  modelo: "nousresearch/hermes-3-llama-3.1-405b:free",
   provider: "openrouter",
 };
 

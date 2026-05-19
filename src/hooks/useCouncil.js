@@ -4,6 +4,8 @@ import { calcularConsensoMatematico, runJudges } from "../api/judges.js";
 import { runKing } from "../api/king.js";
 import {
   LOBOS,
+  construirSystemPromptOmega,
+  runDagCognitivo,
   runDebate as runDebateApi,
   runDebateStream as runDebateStreamApi,
   precisaAprovacao,
@@ -24,6 +26,13 @@ import {
 // Cache curta de respostas dos lobos para evitar chamadas repetidas.
 const responseCache = new Map();
 const CACHE_TTL = 5 * 60 * 1000;
+
+export const FASES_DAG = {
+  OCIOSO: "ocioso",
+  GERACAO: "geracao",
+  CRITICA: "critica",
+  SINTESE: "sintese",
+};
 
 function cacheGet(id, q) {
   const k = id + "::" + q;
@@ -100,6 +109,107 @@ function lobeDebateParaUI(lobe, index, ronda1, ronda2, ronda3, lobeConfidenceSco
   };
 }
 
+function parseJsonSeguro(valor) {
+  if (!valor || typeof valor !== "string") return null;
+  try {
+    return JSON.parse(valor);
+  } catch {
+    const match = valor.match(/\{[\s\S]*\}/);
+    if (!match) return null;
+    try {
+      return JSON.parse(match[0]);
+    } catch {
+      return null;
+    }
+  }
+}
+
+function garantirTresChips(suggestions) {
+  const base = Array.isArray(suggestions) ? suggestions.filter(Boolean).map(String).slice(0, 3) : [];
+  for (const fallback of ["Aprofunda isto", "Mostra exemplos", "Resume a decisão"]) {
+    if (base.length >= 3) break;
+    if (!base.includes(fallback)) base.push(fallback);
+  }
+  return base;
+}
+
+function primeiroLoboValido(payloadOmega) {
+  return (payloadOmega?.fase_alpha || []).find((item) => item?.sucesso && item?.lobo)?.lobo || "Lobe X";
+}
+
+function garantirCitacaoLobe(texto, payloadOmega) {
+  const valor = String(texto || "").trim();
+  if (/\[[^\]]+\]/.test(valor)) return valor;
+  return `${valor || "Síntese concluída."} [${primeiroLoboValido(payloadOmega)}]`;
+}
+
+function lobeDagParaUI(lobe, index, faseAlpha = [], faseBeta = [], lobeConfidenceScore) {
+  const alpha = faseAlpha.find((item) => item.lobo === lobe.nome);
+  const betaComoRevisor = faseBeta.find((item) => item.lobo === lobe.nome);
+  const erro = alpha?.sucesso === false ? alpha.conteudo || "Lobo indisponível" : null;
+  const result = erro ? `[Erro em ${lobe.nome}: ${erro}]` : alpha?.conteudo || "";
+  const isErr = Boolean(erro) || !result || result.startsWith("[Erro");
+
+  return {
+    id: `dag-${lobe.id}`,
+    streamId: lobe.id,
+    label: lobe.nome,
+    sub: lobe.provider,
+    color: lobe.cor,
+    icon: ["◉", "◈", "◐", "◑", "◒"][index] || "◌",
+    _key: `dag-${lobe.id}-${index}`,
+    result,
+    ronda1: alpha?.conteudo || "",
+    ronda2: betaComoRevisor?.conteudo || "",
+    ronda3: "",
+    critique: {
+      text: betaComoRevisor?.conteudo || "",
+      targets: betaComoRevisor?.alvos_criticados || [],
+      incoming: faseBeta
+        .filter((item) => item.alvos_criticados?.includes(lobe.nome))
+        .map((item) => ({ from: item.lobo, text: item.conteudo })),
+    },
+    srcModel: alpha?.modelo || lobe.modelo,
+    srcReal: !isErr,
+    isErr,
+    latency: alpha?.telemetria?.tempo_ms || null,
+    tokens: alpha?.telemetria?.total_tokens || null,
+    confidence: lobeConfidenceScore(result, isErr),
+  };
+}
+
+export async function invocarReiClaude({ pergunta, payloadOmega, callClaude, signal } = {}) {
+  if (signal?.aborted) throw new DOMException("Operação cancelada", "AbortError");
+  if (typeof callClaude !== "function") throw new Error("callClaude indisponível para a síntese Ómega");
+
+  const system = construirSystemPromptOmega(payloadOmega?.fase_alpha || [], payloadOmega?.fase_beta || []);
+  const bruto = await callClaude(system, JSON.stringify(payloadOmega, null, 2), 2200);
+  if (signal?.aborted) throw new DOMException("Operação cancelada", "AbortError");
+
+  const parseado = parseJsonSeguro(bruto) || { veredicto: String(bruto || "").trim() };
+  const scoreConsenso = Number(payloadOmega?.conselho_metadata?.score_consenso_pct || 0);
+  const confiancaFinal = Number.isFinite(Number(parseado.confianca_final))
+    ? Math.max(0, Math.min(100, Math.round(Number(parseado.confianca_final))))
+    : scoreConsenso;
+
+  return {
+    raciocinio: Array.isArray(parseado.raciocinio) ? parseado.raciocinio.filter(Boolean).map(String) : [],
+    veredicto: garantirCitacaoLobe(parseado.veredicto || parseado.final || parseado.answer, payloadOmega),
+    confianca_lobos: Number.isFinite(Number(parseado.confianca_lobos))
+      ? Math.round(Number(parseado.confianca_lobos))
+      : scoreConsenso,
+    confianca_juizes: parseado.confianca_juizes ?? null,
+    confianca_final: confiancaFinal,
+    admite_incerteza: confiancaFinal < 40 ? true : Boolean(parseado.admite_incerteza),
+    razao_incerteza: confiancaFinal < 40
+      ? parseado.razao_incerteza || "Consenso preliminar inferior a 40%."
+      : parseado.razao_incerteza || null,
+    suggestions: garantirTresChips(parseado.suggestions || parseado.chips),
+    planning_summary: parseado.planning_summary || `Síntese Ómega baseada em ${primeiroLoboValido(payloadOmega)}.`,
+    pergunta,
+  };
+}
+
 export async function runDebate(pergunta, modo = "paralelo", options = {}) {
   return runDebateApi(pergunta, modo, options);
 }
@@ -111,7 +221,7 @@ export async function runDebateStream(pergunta, modo = "paralelo", options = {})
 
 
 export default function useCouncil(msgs, setMsgs) {
-  const [phase, setPhase] = useState(null);
+  const [phase, setPhase] = useState(FASES_DAG.OCIOSO);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationState, setGenerationState] = useState(GENERATION_STATES.IDLE);
   const [generationTime, setGenerationTime] = useState(0);
@@ -177,7 +287,7 @@ export default function useCouncil(msgs, setMsgs) {
     adicionarMensagemInterrompida();
     setIsGenerating(false);
     setGenerationState(GENERATION_STATES.STOPPED);
-    setPhase(null);
+    setPhase(FASES_DAG.OCIOSO);
   }
 
   function devePararGeracao() {
@@ -301,7 +411,7 @@ export default function useCouncil(msgs, setMsgs) {
     } = ctx;
 
     const q = (query || input).trim();
-    if (!q || phase) return;
+    if (!q || phase !== FASES_DAG.OCIOSO) return;
 
     if (precisaAprovacao(q) && !ctx.options?.aprovado) {
       return gerarMensagemAprovacao(q);
@@ -350,18 +460,16 @@ export default function useCouncil(msgs, setMsgs) {
     const newBuf = bufComprimido;
     const mem = buildMem(brain);
     const usedMem = selectUsedMem(brain, q);
-    const routedIds = routerDecide(q);
 
     let councilLobes = LOBES.filter(
       (l) =>
         modelsOn[l.id] !== false &&
-        routedIds.includes(l.id) &&
         (!focusMode || focusLobes.has(l.id))
     ).slice(0, 5);
 
     if (!councilLobes.length && focusMode) {
       councilLobes = LOBES.filter(
-        (l) => modelsOn[l.id] !== false && routedIds.includes(l.id)
+        (l) => modelsOn[l.id] !== false
       ).slice(0, 5);
     }
 
@@ -370,7 +478,7 @@ export default function useCouncil(msgs, setMsgs) {
       qFinal += "\n\n[System Note: The user seems frustrated. Please adopt an extremely empathetic, clear, and helpful tone.]";
     }
 
-    setPhase("council");
+    setPhase(FASES_DAG.GERACAO);
     try {
       const refined = await callOpenRouter("gemini", P.refine(q), q, 120, 3500, {
         signal: abortControllerRef.current.signal,
@@ -386,7 +494,7 @@ export default function useCouncil(msgs, setMsgs) {
     } catch (e) {
       if (devePararGeracao() || e.name === "AbortError") {
         setIsGenerating(false);
-        setPhase(null);
+        setPhase(FASES_DAG.OCIOSO);
         return;
       }
       // Falha silenciosa.
@@ -394,6 +502,7 @@ export default function useCouncil(msgs, setMsgs) {
     if (devePararGeracao()) return;
 
     let debateResultado = null;
+    let payloadOmega = null;
     let nextLobeResults = [];
 
     let activeTemps = temperaturas;
@@ -402,31 +511,26 @@ export default function useCouncil(msgs, setMsgs) {
       Object.keys(activeTemps).forEach(k => activeTemps[k] = 0.2);
     }
 
-    const modoExecucao = modoDebate === "debate" ? "debate" : "paralelo";
-    const onTokenParcial = (delta, textoTotal, lobe) => {
-      setGenerationState(s => (s === GENERATION_STATES.THINKING ? GENERATION_STATES.WRITING : s));
-      partialTextRef.current[lobe.id] = textoTotal;
-      streaming?.onToken?.(delta, textoTotal, lobe);
-    };
-    streaming?.iniciar?.();
-    try {
-      debateResultado = await runDebateStream(qFinal, modoExecucao, {
-        lobos: councilLobes,
-        temperaturas: activeTemps,
-        imageDataUrl,
-        systemPrompts,
-        messages: messagesParaEnviar, // <--- ADICIONADO
-        signal: abortControllerRef.current.signal,
-        onToken: onTokenParcial,
-        onPhase: (p) => setPhase(p),
-      });
-    } finally {
-      streaming?.terminar?.();
-    }
+    debateResultado = await runDagCognitivo(qFinal, {
+      lobos: councilLobes,
+      temperaturas: activeTemps,
+      imageDataUrl,
+      systemPrompts,
+      messages: messagesParaEnviar,
+      signal: abortControllerRef.current.signal,
+      controllersMap: controllersRef.current,
+      onPhase: (p) => setPhase(p),
+      onAlpha: (faseAlpha) => {
+        setGenerationState((s) => (s === GENERATION_STATES.THINKING ? GENERATION_STATES.WRITING : s));
+        const uiAlpha = councilLobes.map((l, i) => lobeDagParaUI(l, i, faseAlpha, [], lobeConfidenceScore));
+        setLobeResults(uiAlpha);
+      },
+    });
     if (devePararGeracao()) return;
-    setDebateResult(modoExecucao === "debate" ? debateResultado : null);
+    setDebateResult(debateResultado);
+    payloadOmega = debateResultado.payload_omega;
     nextLobeResults = councilLobes.map((l, i) =>
-      lobeDebateParaUI(l, i, debateResultado.ronda1, debateResultado.ronda2, debateResultado.ronda3, lobeConfidenceScore)
+      lobeDagParaUI(l, i, debateResultado.fase_alpha, debateResultado.fase_beta, lobeConfidenceScore)
     );
     setLobeResults(nextLobeResults);
     nextLobeResults
@@ -434,64 +538,35 @@ export default function useCouncil(msgs, setMsgs) {
       .slice(0, 2)
       .forEach((l) => toast?.(`Lobo ${l.label || l.id} falhou — a usar reserva`, "aviso"));
 
-    const consenso = calcularConsensoMatematico(nextLobeResults);
-    const juizesActivos = getJuizesParaPergunta(q);
+    const consenso = (payloadOmega?.conselho_metadata?.score_consenso_pct || 0) / 100;
     setConsensusScore(consenso);
 
-    setPhase("judges");
     let veredictoJuizes = [];
-    const ctrlJuizes = new AbortController();
-    controllersRef.current.set("judges", ctrlJuizes);
-    
-    // Gerar Anel de Crítica Dinâmico (Ring Map)
-    const ringMap = {};
-    const ids = councilLobes.map(l => l.id);
-    ids.forEach((id, idx) => {
-      ringMap[id] = ids[(idx + 1) % ids.length];
-    });
-
-    // Payload enriquecido para os juízes com o debate auditável e estruturado
-    const payloadAuditavel = {
-      initialResponses: nextLobeResults.map(r => ({ id: r.streamId, lobo: r.label, text: r.ronda1 })),
-      critiques: nextLobeResults.map(r => ({ from: r.streamId, to: r.critique.target, text: r.critique.text })),
-      pairingMap: ringMap,
-      debateFormat: `Anel Circular Fixo (${ids.length} Lobos)`
-    };
-
-    try {
-      veredictoJuizes = await runJudges(
-        q,
-        nextLobeResults,
-        juizesActivos,
-        ctrlJuizes.signal,
-        (juiz) => setJudgeResults((prev) => upsertJudge(prev, juiz)),
-        payloadAuditavel // Passa o debate estruturado como contexto extra
-      );
-      veredictoJuizes = dedupeJudges(veredictoJuizes);
-      setJudgeResults(veredictoJuizes);
-    } catch (e) {
-      if (!devePararGeracao()) {
-        const erro = classifyError(e);
-        toast?.(`Juízes: ${erro.mensagem} ${erro.accao}.`, "erro");
-      }
-    } finally {
-      if (controllersRef.current.get("judges") === ctrlJuizes) controllersRef.current.delete("judges");
-    }
+    setJudgeResults(veredictoJuizes);
     if (devePararGeracao()) return;
 
-    setPhase("rei");
+    setPhase(FASES_DAG.SINTESE);
     let resultadoRei = null;
     const ctrlRei = new AbortController();
+    const abortarReiPorPai = () => ctrlRei.abort();
+    if (abortControllerRef.current.signal.aborted) ctrlRei.abort();
+    else abortControllerRef.current.signal.addEventListener("abort", abortarReiPorPai, { once: true });
     controllersRef.current.set("rei", ctrlRei);
     try {
-      resultadoRei = await runKing(q, nextLobeResults, veredictoJuizes, consenso, ctrlRei.signal, { messages: messagesParaEnviar });
+      resultadoRei = await invocarReiClaude({
+        pergunta: q,
+        payloadOmega,
+        callClaude,
+        signal: ctrlRei.signal,
+      });
       setKingResult(resultadoRei);
     } catch (e) {
       if (!devePararGeracao()) {
         const erro = classifyError(e);
-        toast?.(`Rei: ${erro.mensagem} ${erro.accao}.`, "erro");
+        toast?.(`Síntese: ${erro.mensagem} ${erro.accao}.`, "erro");
       }
     } finally {
+      abortControllerRef.current.signal.removeEventListener("abort", abortarReiPorPai);
       if (controllersRef.current.get("rei") === ctrlRei) controllersRef.current.delete("rei");
     }
 
@@ -512,14 +587,20 @@ export default function useCouncil(msgs, setMsgs) {
       cR = resultadoRei.veredicto || fallbackDosLobos(nextLobeResults);
       structured = {
         final: cR,
-        consensus: veredictoJuizes.flatMap((j) => j.resultado?.validados || []).slice(0, 5),
-        divergence: veredictoJuizes.flatMap((j) => j.resultado?.problemas || []).slice(0, 5),
+        consensus: (payloadOmega?.fase_alpha || [])
+          .filter((item) => item.sucesso)
+          .map((item) => `${item.lobo}: ${String(item.conteudo || "").slice(0, 140)}`)
+          .slice(0, 5),
+        divergence: (payloadOmega?.fase_beta || [])
+          .filter((item) => item.sucesso)
+          .map((item) => `${item.lobo} criticou ${item.alvos_criticados.join(", ")}: ${String(item.conteudo || "").slice(0, 140)}`)
+          .slice(0, 5),
         nextActions: resultadoRei.suggestions || [],
         confidence: `${resultadoRei.confianca_final}%`,
         king: resultadoRei,
       };
     } else {
-      setPhase("cortex");
+      setPhase(FASES_DAG.SINTESE);
       try {
       const validLobes = nextLobeResults.filter((l) => !l.isErr && l.result?.length > 10);
       if (hC || hP)
@@ -574,7 +655,9 @@ export default function useCouncil(msgs, setMsgs) {
       council,
       lobeResults: nextLobeResults,
       debate: debateResultado,
-      modoDebate: modoDebate === "debate",
+      faseBeta: debateResultado?.fase_beta || [],
+      payloadOmega,
+      modoDebate: false,
       judges: veredictoJuizes,
       king: resultadoRei,
       graders,
@@ -631,7 +714,7 @@ export default function useCouncil(msgs, setMsgs) {
 
     setBrain(nb);
     saveBrain(nb);
-    setPhase(null);
+    setPhase(FASES_DAG.OCIOSO);
 
     if (compressed) {
       const note = {
@@ -665,7 +748,7 @@ export default function useCouncil(msgs, setMsgs) {
     consensusScore,
     debateResult,
     cacheSize: responseCache.size,
-    phase,
+    phase: phase === FASES_DAG.OCIOSO ? null : phase,
     setPhase,
     stopGeneration,
     isGenerating,

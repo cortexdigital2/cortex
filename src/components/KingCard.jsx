@@ -115,6 +115,7 @@ const KingCard = React.memo(function KingCard({
   isMobile,
   toast,
   beforeVerdict,
+  PainelSinteseComponent,
   children,
 }) {
   const king = m.king || m.resultadoRei || m.structured?.king || null;
@@ -296,9 +297,13 @@ const KingCard = React.memo(function KingCard({
         )}
 
         <div style={{ paddingBottom: 4, borderBottom: `1px solid ${T.b1 || "var(--border)"}` }}>
-          <ChatBubble papel="rei" nome="Rei do Córtex" cor={accent} destaque>
-            <Markdown text={textoPrincipal} color={T.tx || "var(--text-h)"} faint={T.ts || "var(--text)"} />
-          </ChatBubble>
+          {PainelSinteseComponent ? (
+            <PainelSinteseComponent respostaBruta={textoPrincipal} />
+          ) : (
+            <ChatBubble papel="rei" nome="Rei do Córtex" cor={accent} destaque>
+              <Markdown text={textoPrincipal} color={T.tx || "var(--text-h)"} faint={T.ts || "var(--text)"} />
+            </ChatBubble>
+          )}
         </div>
 
         {dadosExport.veredicto && (
