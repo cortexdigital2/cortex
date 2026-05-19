@@ -30,6 +30,11 @@ export default defineConfig({
   },
 
   server: {
+    host: true, // Permite acesso pela rede local
+    hmr: {
+      // Deixa o cliente HMR inferir o host/porto automaticamente
+      clientPort: process.env.PORT ? parseInt(process.env.PORT) : undefined,
+    },
     // Proxy só activo quando corre `npm run dev` sem vercel dev.
     // Com `vercel dev`, o /api é tratado directamente pelo vercel.
     proxy: {
