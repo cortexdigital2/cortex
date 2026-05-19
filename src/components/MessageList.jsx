@@ -3,7 +3,8 @@ import LobeCard from "./LobeCard";
 import ClaudeCard from "./ClaudeCard";
 import ChatBubble from "./ChatBubble";
 import { HISTORY_LIMIT } from "../utils/trimHistory";
-
+import SwipeableChatBubble from "../mobile/components/SwipeableChatBubble";
+import LongPressMenu from "../mobile/components/LongPressMenu";
 const GENERIC_ERROR_SUGGESTIONS = new Set([
   "Tenta reformular a pergunta",
   "Reporta o erro",
@@ -34,6 +35,41 @@ const MessageList = React.memo(function MessageList({
   onSuggestionClick = () => {},
 }) {
   const ClaudeCardView = ClaudeCardComponent;
+
+  const handleCopy = (msg) => {
+    const text = msg.structured?.final || msg.content || "";
+    navigator.clipboard.writeText(text);
+    toast?.("Copiado para a área de transferência", "sucesso");
+  };
+
+  const handleShare = (msg) => {
+    const text = msg.structured?.final || msg.content || "";
+    if (navigator.share) {
+      navigator.share({ title: "Córtex Digital", text }).catch(() => {});
+    } else {
+      handleCopy(msg);
+    }
+  };
+
+  const handleFork = (msg) => {
+    toast?.("Fork (Branching) em desenvolvimento.", "aviso");
+  };
+
+  const wrapMobileGestures = (contentNode, msg) => {
+    if (!isMobile) return contentNode;
+    return (
+      <LongPressMenu
+        message={msg}
+        onCopy={handleCopy}
+        onShare={handleShare}
+        onFork={handleFork}
+      >
+        <SwipeableChatBubble onDelete={() => setMsgs((prev) => prev.filter((x) => x.id !== msg.id))}>
+          {contentNode}
+        </SwipeableChatBubble>
+      </LongPressMenu>
+    );
+  };
 
   return (
     <>
@@ -80,7 +116,7 @@ const MessageList = React.memo(function MessageList({
             gap: 8,
           }}
         >
-          {m.role === "user" ? (
+          {m.role === "user" ? wrapMobileGestures((
             <ChatBubble
               papel="user"
               cor={AC.claude}
@@ -124,7 +160,7 @@ const MessageList = React.memo(function MessageList({
                 </div>
               )}
             </ChatBubble>
-          ) : m.systemNote ? (
+          ), m) : m.systemNote ? (
             <div
               style={{
                 alignSelf: "center",
@@ -139,7 +175,7 @@ const MessageList = React.memo(function MessageList({
             >
               {m.content}
             </div>
-          ) : (
+          ) : wrapMobileGestures((
             <ClaudeCardView
               m={m}
               i={i}
@@ -235,7 +271,7 @@ const MessageList = React.memo(function MessageList({
                 </div>
               )}
             </ClaudeCardView>
-          )}
+          ), m)}
         </div>
           </React.Fragment>
         );
