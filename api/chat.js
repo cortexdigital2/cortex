@@ -2,6 +2,10 @@ import sanitize from "../middleware/sanitize.js";
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 const PROD_ORIGIN = "https://cortex-digital.vercel.app";
+const RATE_LIMIT_WINDOW_MS = 60 * 1000;
+const RATE_LIMIT_MAX_REQUESTS = 20;
+
+const rateLimitChat = new Map();
 
 const FREE_FALLBACKS = [
   "google/gemma-3-4b-it:free",
@@ -27,6 +31,36 @@ function erroTexto(erro) {
   return erro.message || JSON.stringify(erro);
 }
 
+function obterIp(req) {
+  const forwarded = req.headers?.["x-forwarded-for"] || req.headers?.["x-real-ip"];
+  if (Array.isArray(forwarded)) return forwarded[0]?.split(",")[0]?.trim() || "desconhecido";
+  if (typeof forwarded === "string" && forwarded.trim()) return forwarded.split(",")[0].trim();
+  return req.socket?.remoteAddress || req.connection?.remoteAddress || "desconhecido";
+}
+
+export function limparRateLimitChat() {
+  rateLimitChat.clear();
+}
+
+export function verificarRateLimitChat(req, agora = Date.now()) {
+  const ip = obterIp(req);
+  const actual = rateLimitChat.get(ip);
+
+  // Janela fixa simples por IP; suficiente para proteger o gateway serverless.
+  if (!actual || actual.resetAt <= agora) {
+    rateLimitChat.set(ip, { count: 1, resetAt: agora + RATE_LIMIT_WINDOW_MS });
+    return { permitido: true };
+  }
+
+  if (actual.count >= RATE_LIMIT_MAX_REQUESTS) {
+    return { permitido: false };
+  }
+
+  actual.count += 1;
+  rateLimitChat.set(ip, actual);
+  return { permitido: true };
+}
+
 export default async function handler(req, res) {
   // Segurança: Sanitize input
   let nextCalled = false;
@@ -41,6 +75,11 @@ export default async function handler(req, res) {
 
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Método não permitido" });
+  }
+
+  const limite = verificarRateLimitChat(req);
+  if (!limite.permitido) {
+    return res.status(429).json({ error: "Demasiados pedidos. Aguarda 1 minuto." });
   }
 
   const { model, messages, system, max_tokens, plugins, response_format } = req.body || {};

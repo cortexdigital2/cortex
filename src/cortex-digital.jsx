@@ -118,6 +118,50 @@ const defaultKeys = {
   manus:""
 };
 
+export function obterBadgeConfianca(confiancaFinal) {
+  const valor = Number(confiancaFinal);
+  if (!Number.isFinite(valor) || valor >= 70) return null;
+  if (valor >= 40) return { texto: "Confiança média", cor: "#f59e0b", icone: "⚠️" };
+  return { texto: "Baixa confiança", cor: "#ef4444", icone: "🔴" };
+}
+
+function ConfidenceBadge({ confiancaFinal }) {
+  const badge = obterBadgeConfianca(confiancaFinal);
+  if (!badge) return null;
+
+  return (
+    <div
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 6,
+        alignSelf: "flex-start",
+        background: `${badge.cor}18`,
+        border: `1px solid ${badge.cor}55`,
+        borderRadius: 999,
+        color: badge.cor,
+        fontSize: 11,
+        fontWeight: 800,
+        lineHeight: 1,
+        padding: "6px 9px",
+      }}
+      title={`Confiança final: ${Math.round(Number(confiancaFinal))}%`}
+    >
+      <span aria-hidden="true">{badge.icone}</span>
+      <span>{badge.texto}</span>
+    </div>
+  );
+}
+
+function PainelSinteseComConfianca({ respostaBruta, confiancaFinal }) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      <ConfidenceBadge confiancaFinal={confiancaFinal} />
+      <PainelSintese respostaBruta={respostaBruta} />
+    </div>
+  );
+}
+
 // â”€â”€ PIN DE DESENVOLVIMENTO â€” muda em localStorage("cortex-dev-pin") â”€â”€â”€â”€â”€â”€â”€â”€
 const DEV_PIN_KEY="cortex-dev-pin";
 function getDevPin(){return localStorage.getItem(DEV_PIN_KEY)||"3004";}
@@ -1768,7 +1812,7 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
   toast={toast}
   ClaudeCardComponent={KingCard}
   BeforeVerdictComponent={DebateTimeline}
-  PainelSinteseComponent={PainelSintese}
+  PainelSinteseComponent={PainelSinteseComConfianca}
   textosParciais={textosParciais}
   aStreaming={aStreaming}
   onSuggestionClick={aplicarSugestaoRei}

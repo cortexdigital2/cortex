@@ -43,6 +43,13 @@ export function buildMemoryEntry(messages, conversationId) {
  * @param {Object} entry - Resultado de buildMemoryEntry()
  */
 export async function saveMemoryEntry(userId, entry) {
+  // Compatibilidade com chamadas legadas que passam apenas a entrada.
+  if (entry === undefined && userId && typeof userId === "object") {
+    entry = userId;
+    userId = "anon";
+  }
+  if (!entry) return;
+
   // 1. Backup local
   try {
     const existing = loadMemoryEntries();
@@ -172,4 +179,3 @@ export function clearMemory() {
 }
 
 export { getLatestMemories };
-
