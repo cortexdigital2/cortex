@@ -1415,7 +1415,7 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
         </Modal>
       )}
 
-      {/* â”€â”€ NAVEGAÇÃO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      {/* ———————————————————————————————————————————————— */}
 <nav style={{display:"grid",gridTemplateColumns:isMobile?"1fr auto":"minmax(260px,1fr) auto",alignItems:"center",minHeight:64,padding:"8px 12px",background:`linear-gradient(180deg, ${T.s1}, ${T.bg})`,borderBottom:`1px solid ${AC.claude}44`,gap:12,flexShrink:0,boxShadow:`0 8px 24px ${T.b2}66`}}>
   <button
     type="button"
@@ -1434,7 +1434,7 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
   </button>
 
   <div style={{display:"flex",alignItems:"center",justifyContent:"flex-end",gap:6,overflowX:"auto",WebkitOverflowScrolling:"touch",paddingBottom:1}}>
-    {!isMobile && [["chat","â–£","Chat"],...(DEV_MODE?[["keys","🔑","Chaves API"]]:[]),["memory","🧠","Memória"],["settings","âš™","Definições"]].map(([p,ico,lbl],idx)=>{
+    {!isMobile && [["chat","💬","Chat"],...(DEV_MODE?[["keys","🔑","Chaves API"]]:[]),["memory","🧠","Memória"],["settings","⚙️","Definições"]].map(([p,ico,lbl],idx)=>{
       const active=page===p&&pagina!=="blueprints";
       return (
         <button
@@ -1460,7 +1460,7 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
         onClick={() => {setShowBlueprintsPanel(true);setPage("chat");setPagina("chat");}}
         style={{background:showBlueprintsPanel?`${AC.claude}20`:T.s2,border:`1px solid ${showBlueprintsPanel?AC.claude+"66":T.b1}`,borderRadius:12,minHeight:42,padding:"8px 13px",transition:"all 220ms cubic-bezier(0.4,0,0.2,1)",boxShadow:showBlueprintsPanel?`0 0 16px ${AC.claude}22`:"none",color:showBlueprintsPanel?AC.claude:T.ts,cursor:"pointer",fontSize:12,fontFamily:"inherit",fontWeight:showBlueprintsPanel?800:600,display:"flex",alignItems:"center",gap:7,flexShrink:0}}
       >
-        <span>ðŸ—ºï¸</span>
+        <span>🗺️</span>
         <span>Mapas</span>
       </button>
     )}
@@ -1472,7 +1472,7 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
         style={{background:modoCode?"var(--accent)":"transparent",border:`1px solid ${modoCode?"var(--accent)":T.b1}`,borderRadius:12,minHeight:42,padding:"8px 13px",transition:"all 220ms cubic-bezier(0.4,0,0.2,1)",boxShadow:modoCode?"0 0 16px var(--accent-bg)":"none",color:modoCode?"white":"var(--text-secondary, #8a8aa0)",cursor:"pointer",fontSize:12,fontFamily:"inherit",fontWeight:modoCode?800:600,display:"flex",alignItems:"center",gap:7,flexShrink:0}}
         title={"Modo Code Agent"}
       >
-        {"ðŸ’» Código"}
+        {"💻 Código"}
       </button>
     )}
 
@@ -1490,7 +1490,7 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
       style={{...navBtn(T),minWidth:42,minHeight:42,background:showSidebar?`${AC.claude}22`:T.s2,borderColor:showSidebar?`${AC.claude}55`:T.b1}}
       title={"Histórico"}
     >
-      â˜°
+      ☰
     </button>
   </div>
 </nav>
