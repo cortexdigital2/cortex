@@ -45,9 +45,9 @@ const BUILD = typeof __BUILD_NUM__ !== "undefined" ? __BUILD_NUM__ : "DEV";
 const APP_VERSION = `v12.${BUILD}`;
 
 const THEMES={
-  cortex:    {name:"CÃ³rtex",     emoji:"ðŸ§ ",bg:"#08080c",s1:"#0f0f16",s2:"#14141e",s3:"#1a1a26",b1:"#222232",b2:"#161622",tx:"#e8e8f8",ts:"#6868a0",tf:"#2a2a44"},
+  cortex:    {name:"Córtex",     emoji:"🧠",bg:"#08080c",s1:"#0f0f16",s2:"#14141e",s3:"#1a1a26",b1:"#222232",b2:"#161622",tx:"#e8e8f8",ts:"#6868a0",tf:"#2a2a44"},
   grok:      {name:"Grok",       emoji:"âš¡",bg:"#060608",s1:"#0d0d10",s2:"#121215",s3:"#181820",b1:"#202025",b2:"#141418",tx:"#f0f0f8",ts:"#505060",tf:"#1e1e28"},
-  neural:    {name:"Neural",     emoji:"ðŸ”¬",bg:"#04060a",s1:"#080c14",s2:"#0c1020",s3:"#101828",b1:"#162030",b2:"#0e1828",tx:"#d8ecff",ts:"#3a6090",tf:"#0c1828"},
+  neural:    {name:"Neural",     emoji:"🔬",bg:"#04060a",s1:"#080c14",s2:"#0c1020",s3:"#101828",b1:"#162030",b2:"#0e1828",tx:"#d8ecff",ts:"#3a6090",tf:"#0c1828"},
   obsidian:  {name:"Obsidian",   emoji:"ðŸª¨",bg:"#0a0a0a",s1:"#111111",s2:"#161616",s3:"#1e1e1e",b1:"#252525",b2:"#1c1c1c",tx:"#eeeeee",ts:"#666666",tf:"#2a2a2a"},
   midnight:  {name:"Midnight",   emoji:"ðŸŒ™",bg:"#03030f",s1:"#07071a",s2:"#0a0a22",s3:"#0e0e2e",b1:"#14143a",b2:"#0d0d2a",tx:"#d0d0ff",ts:"#5050a0",tf:"#14143a"},
   gemini:    {name:"Gemini",     emoji:"ðŸŒ€",bg:"#070a0f",s1:"#0c1018",s2:"#101520",s3:"#141a28",b1:"#1c2638",b2:"#141e30",tx:"#d8e4ff",ts:"#4a6898",tf:"#182040"},
@@ -75,7 +75,7 @@ const AC={
   openai:"#74aa9c",deepseek:"#4d9fff",llama:"#e879f9",mistral:"#f97316",nemotron:"#a3e635",
   ollama_codigo:"#634b37",ollama_debug:"#c9c17f"
 };
-// â”€â”€ URLs DAS CHAVES â€” para busca automÃ¡tica quando a chave expira â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â”€â”€ URLs DAS CHAVES — para busca automática quando a chave expira â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const KEY_URLS={
   grok:      "console.x.ai",
   gemini:    "aistudio.google.com/apikey",
@@ -88,12 +88,12 @@ const KEY_URLS={
   claude:    "console.anthropic.com/settings/keys",
 };
 
-// â”€â”€ MODO DE DESENVOLVIMENTO â€” acesso sem PIN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// Para ativar: localStorage.setItem("cortex-dev-bypass","1")  â†’ recarrega
-// Para revogar: localStorage.removeItem("cortex-dev-bypass")  â†’ recarrega
+// â”€â”€ MODO DE DESENVOLVIMENTO — acesso sem PIN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Para ativar: localStorage.setItem("cortex-dev-bypass","1")  → recarrega
+// Para revogar: localStorage.removeItem("cortex-dev-bypass")  → recarrega
 const DEV_MODE = localStorage.getItem("cortex-dev-bypass") === "1";
 
-const LOBE_ICONS = ["â—‰", "â—ˆ", "â—", "â—‘", "â—’"];
+const LOBE_ICONS = ["â—‰", "◈", "â—", "â—‘", "â—’"];
 const lobeLabel = (l) => l.label || l.nome || String(l.id);
 const lobeColor = (l) => l.color || l.cor || AC.claude;
 const MODELS = LOBOS.map((l) => ({
@@ -103,7 +103,7 @@ const MODELS = LOBOS.map((l) => ({
   color: l.cor,
 }));
 
-const defaultBrain={episodic:[],semantic:[],patterns:[],procedural:{format:"conciso",lang:"pt",level:"mÃ©dio"},sessions:0,lastReflect:null};
+const defaultBrain={episodic:[],semantic:[],patterns:[],procedural:{format:"conciso",lang:"pt",level:"médio"},sessions:0,lastReflect:null};
 const defaultKeys = {
   grok:"",
   gemini:"", 
@@ -217,7 +217,7 @@ function PainelSinteseComConfianca({ respostaBruta, confiancaFinal, webSources }
   );
 }
 
-// â”€â”€ PIN DE DESENVOLVIMENTO â€” muda em localStorage("cortex-dev-pin") â”€â”€â”€â”€â”€â”€â”€â”€
+// â”€â”€ PIN DE DESENVOLVIMENTO — muda em localStorage("cortex-dev-pin") â”€â”€â”€â”€â”€â”€â”€â”€
 const DEV_PIN_KEY="cortex-dev-pin";
 function getDevPin(){return localStorage.getItem(DEV_PIN_KEY)||"3004";}
 
@@ -247,9 +247,9 @@ function normBrain(r){
 // â”€â”€ AUXILIARES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function buildMem(b){
   const p=[];
-  if(b.semantic.length)p.push("FACTOS:\n"+b.semantic.slice(-15).map(s=>`â€¢ [${s.tipo}] ${s.descricao}`).join("\n"));
-  if(b.episodic.length)p.push("PASSADO:\n"+b.episodic.slice(-5).map(e=>`â€¢ ${e}`).join("\n"));
-  if(b.patterns.length)p.push("PADRÃ•ES:\n"+b.patterns.map(x=>`â€¢ ${x}`).join("\n"));
+  if(b.semantic.length)p.push("FACTOS:\n"+b.semantic.slice(-15).map(s=>`• [${s.tipo}] ${s.descricao}`).join("\n"));
+  if(b.episodic.length)p.push("PASSADO:\n"+b.episodic.slice(-5).map(e=>`• ${e}`).join("\n"));
+  if(b.patterns.length)p.push("PADRÕES:\n"+b.patterns.map(x=>`• ${x}`).join("\n"));
   return p.join("\n\n")||"Vazio.";
 }
 function selectUsedMem(brain,q){
@@ -260,11 +260,11 @@ function selectUsedMem(brain,q){
 }
 function heuristicDecision(q){
   const s=q.toLowerCase();
-  if(/c[oÃ³]digo|code|programar|script|bug|erro|implementar/.test(s))return"Pergunta tÃ©cnica â†’ priorizei DeepSeek + CÃ³rtex.";
-  if(/hoje|atual|notÃ­cia|recente|2025|2026|mercado|preÃ§o/.test(s))return"Pergunta factual â†’ priorizei Perplexity + Grok.";
-  if(/porquÃª|filosofia|contexto|histÃ³ria|tendÃªncia|futuro/.test(s))return"Pergunta conceptual â†’ priorizei Gemini + Nemotron.";
-  if(/\beu\b|\bmeu\b|\bminha\b|pessoal|objetivo|estudo|curso/.test(s))return"Pergunta pessoal â†’ memÃ³ria semÃ¢ntica + CÃ³rtex.";
-  return"Pergunta mista â†’ o CÃ³rtex combinou todos os lobos.";
+  if(/c[oó]digo|code|programar|script|bug|erro|implementar/.test(s))return"Pergunta técnica → priorizei DeepSeek + Córtex.";
+  if(/hoje|atual|notícia|recente|2025|2026|mercado|preço/.test(s))return"Pergunta factual → priorizei Perplexity + Grok.";
+  if(/porquê|filosofia|contexto|história|tendência|futuro/.test(s))return"Pergunta conceptual → priorizei Gemini + Nemotron.";
+  if(/\beu\b|\bmeu\b|\bminha\b|pessoal|objetivo|estudo|curso/.test(s))return"Pergunta pessoal → memória semântica + Córtex.";
+  return"Pergunta mista → o Córtex combinou todos os lobos.";
 }
 function seedToMem(text,tipo){
   return text.split(/[.\n]/).map(s=>s.trim()).filter(s=>s.length>20).slice(0,3).map(s=>({tipo,descricao:s.slice(0,160),importancia:"alta"}));
@@ -276,37 +276,37 @@ function safeParseReflect(raw){
   }catch{return{new_semantic:[],new_patterns:[],procedural_update:{},session_summary:""};}
 }
 
-// â”€â”€ INSTRUÃ‡Ã•ES DOS MODELOS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-function detectLang(){return "Responde em PortuguÃªs de Portugal.";}
+// â”€â”€ INSTRUÇÕES DOS MODELOS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function detectLang(){return "Responde em Português de Portugal.";}
 const P={
-  grok:    (m,q)=>`Ã‰s o GROK â€” especialista em factos. DÃ¡ dados concretos e precisos. Sem introduÃ§Ã£o. MemÃ³ria:\n${m}\nPergunta: ${q}\nMÃ¡x. 100 palavras. ${detectLang(q)}`,
-  gemini:  (m,q)=>`Ã‰s o GEMINI â€” pensador sistÃ©mico. Encontra padrÃµes e visÃ£o de conjunto. MemÃ³ria:\n${m}\nPergunta: ${q}\nMÃ¡x. 100 palavras. ${detectLang(q)}`,
-  perp:    (m,q)=>`Ã‰s o PERPLEXITY â€” informaÃ§Ã£o actual. DÃ¡ informaÃ§Ã£o recente, precisa e com fontes. MemÃ³ria:\n${m}\nPergunta: ${q}\nMÃ¡x. 100 palavras. ${detectLang(q)}`,
-  genspark:(m,q)=>`Ã‰s o GENSPARK â€” sÃ­ntese criativa. Traz Ã¢ngulos novos e soluÃ§Ãµes inesperadas. MemÃ³ria:\n${m}\nPergunta: ${q}\nMÃ¡x. 100 palavras. ${detectLang(q)}`,
-  manus:   (m,q)=>`Ã‰s o MANUS â€” agente autÃ³nomo e planeador de execuÃ§Ã£o passo a passo.\nMEMÃ“RIA:\n${m}\nPEDIDO: "${q}"\nPassos agentivos, ferramentas e acÃ§Ãµes. MÃ¡x. 120 palavras. Sem introduÃ§Ã£o. PortuguÃªs de Portugal.`,
-  openai:  (m,q)=>`Ã‰s um especialista em raciocÃ­nio. Faz anÃ¡lise estruturada e clara. MemÃ³ria:\n${m}\nPergunta: ${q}\nMÃ¡x. 100 palavras. ${detectLang(q)}`,
-  deepseek:(m,q)=>`Ã‰s o DEEPSEEK â€” especialista em cÃ³digo e lÃ³gica. Para cÃ³digo, usa blocos markdown. MemÃ³ria:\n${m}\nPergunta: ${q}\nMÃ¡x. 100 palavras. ${detectLang(q)}`,
-  llama:   (m,q)=>`Ã‰s o LLAMA â€” conhecimento comunitÃ¡rio amplo e experiÃªncia prÃ¡tica em cÃ³digo aberto. MemÃ³ria:\n${m}\nPergunta: ${q}\nMÃ¡x. 100 palavras. ${detectLang(q)}`,
-  mistral: (m,q)=>`Ã‰s o MISTRAL â€” rÃ¡pido e preciso. Sem enchimento. MemÃ³ria:\n${m}\nPergunta: ${q}\nMÃ¡x. 80 palavras. ${detectLang(q)}`,
-  nemotron:(m,q)=>`Ã‰s o NEMOTRON â€” rigor cientÃ­fico. Usa evidÃªncia e cita mecanismos. MemÃ³ria:\n${m}\nPergunta: ${q}\nMÃ¡x. 100 palavras. ${detectLang(q)}`,
-  ollama_codigo:(m,q)=>`Assistente local de cÃ³digo. DÃ¡ cÃ³digo limpo e funcional com explicaÃ§Ã£o breve. MemÃ³ria:\n${m}\nPergunta: ${q}\nMÃ¡x. 100 palavras. ${detectLang(q)}`,
-  ollama_debug:(m,q)=>`Especialista local de debug. Encontra a causa raiz e dÃ¡ a correcÃ§Ã£o exacta. MemÃ³ria:\n${m}\nPergunta: ${q}\nMÃ¡x. 100 palavras. ${detectLang(q)}`,
-  compress: (msgs) => `Resume este histÃ³rico de conversa num parÃ¡grafo compacto (mÃ¡x. 80 palavras). MantÃ©m factos, decisÃµes e contexto essencial. Sem introduÃ§Ã£o.\n\n${msgs.join("\n")}`,
+  grok:    (m,q)=>`És o GROK — especialista em factos. Dá dados concretos e precisos. Sem introdução. Memória:\n${m}\nPergunta: ${q}\nMáx. 100 palavras. ${detectLang(q)}`,
+  gemini:  (m,q)=>`És o GEMINI — pensador sistémico. Encontra padrões e visão de conjunto. Memória:\n${m}\nPergunta: ${q}\nMáx. 100 palavras. ${detectLang(q)}`,
+  perp:    (m,q)=>`És o PERPLEXITY — informação actual. Dá informação recente, precisa e com fontes. Memória:\n${m}\nPergunta: ${q}\nMáx. 100 palavras. ${detectLang(q)}`,
+  genspark:(m,q)=>`És o GENSPARK — síntese criativa. Traz ângulos novos e soluções inesperadas. Memória:\n${m}\nPergunta: ${q}\nMáx. 100 palavras. ${detectLang(q)}`,
+  manus:   (m,q)=>`És o MANUS — agente autónomo e planeador de execução passo a passo.\nMEMÃ“RIA:\n${m}\nPEDIDO: "${q}"\nPassos agentivos, ferramentas e acções. Máx. 120 palavras. Sem introdução. Português de Portugal.`,
+  openai:  (m,q)=>`És um especialista em raciocínio. Faz análise estruturada e clara. Memória:\n${m}\nPergunta: ${q}\nMáx. 100 palavras. ${detectLang(q)}`,
+  deepseek:(m,q)=>`És o DEEPSEEK — especialista em código e lógica. Para código, usa blocos markdown. Memória:\n${m}\nPergunta: ${q}\nMáx. 100 palavras. ${detectLang(q)}`,
+  llama:   (m,q)=>`És o LLAMA — conhecimento comunitário amplo e experiência prática em código aberto. Memória:\n${m}\nPergunta: ${q}\nMáx. 100 palavras. ${detectLang(q)}`,
+  mistral: (m,q)=>`És o MISTRAL — rápido e preciso. Sem enchimento. Memória:\n${m}\nPergunta: ${q}\nMáx. 80 palavras. ${detectLang(q)}`,
+  nemotron:(m,q)=>`És o NEMOTRON — rigor científico. Usa evidência e cita mecanismos. Memória:\n${m}\nPergunta: ${q}\nMáx. 100 palavras. ${detectLang(q)}`,
+  ollama_codigo:(m,q)=>`Assistente local de código. Dá código limpo e funcional com explicação breve. Memória:\n${m}\nPergunta: ${q}\nMáx. 100 palavras. ${detectLang(q)}`,
+  ollama_debug:(m,q)=>`Especialista local de debug. Encontra a causa raiz e dá a correcção exacta. Memória:\n${m}\nPergunta: ${q}\nMáx. 100 palavras. ${detectLang(q)}`,
+  compress: (msgs) => `Resume este histórico de conversa num parágrafo compacto (máx. 80 palavras). Mantém factos, decisões e contexto essencial. Sem introdução.\n\n${msgs.join("\n")}`,
 cortex: (m, q, lobes) => `
-Tu Ã©s o CÃ³rtex PrÃ©-Frontal â€” o juiz e sintetizador de um conselho multi-IA.
-Regras obrigatÃ³rias:
-1. Responde sempre em PortuguÃªs de Portugal.
-2. Identifica as respostas mais Ãºteis, resolve contradiÃ§Ãµes e sintetiza numa Ãºnica resposta abrangente.
-3. Se houver cÃ³digo, usa markdown.
-4. NÃƒO escrevas introduÃ§Ãµes, nem nÃºmeros antes das frases, nem "âš¡ SÃ­ntese:".
-5. Usa citaÃ§Ãµes inline obrigatÃ³rias no campo "final": apÃ³s cada afirmaÃ§Ã£o coloca [NomeLobo] entre parÃªnteses retos. Exemplo: "A soluÃ§Ã£o mais eficiente Ã© usar indexaÃ§Ã£o. [DeepSeek] No entanto, para dados pequenos uma pesquisa linear pode bastar. [Grok][Gemini]"
-6. Se nÃ£o tiveres dados suficientes para afirmar algo, escreve [Incerto] em vez de inventar.
-7. Devolve APENAS um objeto JSON vÃ¡lido (sem markdown), com esta estrutura exata:
+Tu és o Córtex Pré-Frontal — o juiz e sintetizador de um conselho multi-IA.
+Regras obrigatórias:
+1. Responde sempre em Português de Portugal.
+2. Identifica as respostas mais úteis, resolve contradições e sintetiza numa única resposta abrangente.
+3. Se houver código, usa markdown.
+4. NÃO escrevas introduções, nem números antes das frases, nem "âš¡ Síntese:".
+5. Usa citações inline obrigatórias no campo "final": após cada afirmação coloca [NomeLobo] entre parênteses retos. Exemplo: "A solução mais eficiente é usar indexação. [DeepSeek] No entanto, para dados pequenos uma pesquisa linear pode bastar. [Grok][Gemini]"
+6. Se não tiveres dados suficientes para afirmar algo, escreve [Incerto] em vez de inventar.
+7. Devolve APENAS um objeto JSON válido (sem markdown), com esta estrutura exata:
 {
-  "final": "resposta com citaÃ§Ãµes inline [NomeLobo] apÃ³s cada afirmaÃ§Ã£o",
+  "final": "resposta com citações inline [NomeLobo] após cada afirmação",
   "consensus": ["ponto concordante 1", "ponto concordante 2"],
-  "divergence": ["ponto de divergÃªncia 1"],
-  "confidence": "alta|mÃ©dia|baixa",
+  "divergence": ["ponto de divergência 1"],
+  "confidence": "alta|média|baixa",
   "nextActions": ["passo 1", "passo 2"],
   "sources": ["Lobo1", "Lobo2"]
 }
@@ -325,31 +325,31 @@ ${lobes.map(l => "[ " + l.label + " ]: " + l.result).join("\n\n")}
 `.trim(),
 
   refine: (q) => `
-Ã‰s um optimizador de perguntas para um conselho multi-IA.
-Reescreve a pergunta do utilizador para ficar mais clara, especÃ­fica e adequada a anÃ¡lise paralela por IA.
+És um optimizador de perguntas para um conselho multi-IA.
+Reescreve a pergunta do utilizador para ficar mais clara, específica e adequada a análise paralela por IA.
 Regras:
-- PortuguÃªs de Portugal
-- MÃ¡x. 2 frases
-- Remove ambiguidades e acrescenta contexto implÃ­cito quando for Ã³bvio
-- Devolve APENAS a pergunta reescrita, sem explicaÃ§Ã£o
+- Português de Portugal
+- Máx. 2 frases
+- Remove ambiguidades e acrescenta contexto implícito quando for óbvio
+- Devolve APENAS a pergunta reescrita, sem explicação
 Original: "${q}"
 `.trim(),
 
-  judge: (q, lobeResults) => `Ã‰s o juiz de um conselho de IA com 11 lobos.
+  judge: (q, lobeResults) => `És o juiz de um conselho de IA com 11 lobos.
 Pergunta: "${q}"
 Respostas dos lobos:
 ${lobeResults.map(l => `[${l.label}]: ${l.result?.slice(0, 120)}`).join("\n")}
-Escreve UMA frase (mÃ¡x. 80 palavras) em PortuguÃªs de Portugal a explicar que lobos foram mais Ãºteis e porquÃª. Sem listas.`.trim(),
+Escreve UMA frase (máx. 80 palavras) em Português de Portugal a explicar que lobos foram mais úteis e porquê. Sem listas.`.trim(),
 
-reflect: (buf, mem) => `Analisa esta conversa e devolve APENAS JSON vÃ¡lido, sem markdown.
-Estrutura obrigatÃ³ria:
+reflect: (buf, mem) => `Analisa esta conversa e devolve APENAS JSON válido, sem markdown.
+Estrutura obrigatória:
 {
-  "new_semantic": [{"tipo": "string", "descricao": "string", "importancia": "alta|mÃ©dia|baixa"}],
-  "new_patterns": ["padrÃ£o 1", "padrÃ£o 2"],
-  "procedural_update": {"format": "conciso|detalhado", "lang": "pt", "level": "bÃ¡sico|mÃ©dio|avanÃ§ado"},
-  "session_summary": "resumo da sessÃ£o em 1 frase"
+  "new_semantic": [{"tipo": "string", "descricao": "string", "importancia": "alta|média|baixa"}],
+  "new_patterns": ["padrão 1", "padrão 2"],
+  "procedural_update": {"format": "conciso|detalhado", "lang": "pt", "level": "básico|médio|avançado"},
+  "session_summary": "resumo da sessão em 1 frase"
 }
-Regras: new_semantic mÃ¡x 5 itens; new_patterns mÃ¡x 3; sÃ³ factos novos nÃ£o presentes na memÃ³ria.
+Regras: new_semantic máx 5 itens; new_patterns máx 3; só factos novos não presentes na memória.
 MEMÃ“RIA ATUAL:
 ${mem}
 CONVERSA:
@@ -365,7 +365,7 @@ const OLLAMA_MODELS = {
 
 async function callOllama(sys, msg, modelKey = "codigo", signal) {
   const model = OLLAMA_MODELS[modelKey] || OLLAMA_MODELS.codigo;
-  const prompt = `${sys}\n\nPERGUNTA: ${msg}\n\nResponde em PortuguÃªs de Portugal. MÃ¡x. 120 palavras.`;
+  const prompt = `${sys}\n\nPERGUNTA: ${msg}\n\nResponde em Português de Portugal. Máx. 120 palavras.`;
   const r = await fetch(OLLAMA_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -385,15 +385,15 @@ function classifyQuery(q) {
     const words = q.trim().split(/\s+/).length;
     const s = q.toLowerCase();
 
-    if (words < 8 && /^(olÃ¡|oi|bom dia|boa tarde|obrigad|ok|sim|nÃ£o|certo|fixe|hey|hi|hello)/.test(s))
+    if (words < 8 && /^(olá|oi|bom dia|boa tarde|obrigad|ok|sim|não|certo|fixe|hey|hi|hello)/.test(s))
       return "SIMPLE";
 
-    const complexPatterns = /porquÃª|porque\s|como\s|compara|analisa|debate|diferenÃ§a|vantagens?|desvantagens?|explica|impacto|estratÃ©gia|avalia|crÃ­tica|pros\s|contras\s|trade.?off/i;
+    const complexPatterns = /porquê|porque\s|como\s|compara|analisa|debate|diferença|vantagens?|desvantagens?|explica|impacto|estratégia|avalia|crítica|pros\s|contras\s|trade.?off/i;
     if (complexPatterns.test(s) || words > 25) return "COMPLEX";
 
     return "MEDIUM";
   } catch {
-    return "COMPLEX"; // falha silenciosa â†’ todos os lobos
+    return "COMPLEX"; // falha silenciosa → todos os lobos
   }
 }
 
@@ -403,10 +403,10 @@ function routerDecide(query) {
 
   if (level === "SIMPLE") return COMPLEXITY_SIMPLE_LOBES;
 
-  const isCode    = /cÃ³digo|code|programar|script|bug|erro|implementar|react|js|python|jsx/.test(q);
-  const isDebug   = /debug|problema|falha|crash|corrig|fix|nÃ£o funciona/.test(q);
-  const isCurrent = /hoje|atual|recente|2026|notÃ­cia|mercado|preÃ§o/.test(q);
-  const isPlan    = /plano|etapas|passos|estratÃ©gia|roadmap|arquitetura/.test(q);
+  const isCode    = /código|code|programar|script|bug|erro|implementar|react|js|python|jsx/.test(q);
+  const isDebug   = /debug|problema|falha|crash|corrig|fix|não funciona/.test(q);
+  const isCurrent = /hoje|atual|recente|2026|notícia|mercado|preço/.test(q);
+  const isPlan    = /plano|etapas|passos|estratégia|roadmap|arquitetura/.test(q);
 
   if (level === "MEDIUM") {
     if (isCode && isDebug) return [1, 3, 5];
@@ -416,7 +416,7 @@ function routerDecide(query) {
     return COMPLEXITY_MEDIUM_LOBES;
   }
 
-  // COMPLEX â†’ corre os 5 lobos oficiais do conselho v12.
+  // COMPLEX → corre os 5 lobos oficiais do conselho v12.
   if (isCode && isDebug) return LOBOS_IDS;
   if (isCode)            return LOBOS_IDS;
   if (isCurrent)         return LOBOS_IDS;
@@ -458,7 +458,7 @@ async function fetchWithTimeout(url, opts={}, ms=30000){
     return r;
   }catch(e){
     clearTimeout(tid);
-    if(e.name==="AbortError")throw new Error(`Timeout apÃ³s ${ms/1000}s`);
+    if(e.name==="AbortError")throw new Error(`Timeout após ${ms/1000}s`);
     throw e;
   }
 }
@@ -478,7 +478,7 @@ function Markdown({text,color,faint}){
     if(line.startsWith("### ")){out.push(<div key={`md-h3-${i}-${line.slice(4,14)}`} style={{fontSize:13,fontWeight:700,color,marginTop:8,marginBottom:2}}>{iFmt(line.slice(4))}</div>);i++;continue;}
     if(line.startsWith("## ")) {out.push(<div key={`md-h2-${i}-${line.slice(3,13)}`} style={{fontSize:14,fontWeight:800,color,marginTop:10,marginBottom:3}}>{iFmt(line.slice(3))}</div>);i++;continue;}
     if(line.startsWith("# "))  {out.push(<div key={`md-h1-${i}-${line.slice(2,12)}`} style={{fontSize:15,fontWeight:800,color,marginTop:12,marginBottom:4}}>{iFmt(line.slice(2))}</div>);i++;continue;}
-    if(/^[-*â€¢] /.test(line)){out.push(<div key={`md-bullet-${i}-${line.slice(2,12)}`} style={{display:"flex",gap:6,marginTop:2}}><span style={{color:faint,flexShrink:0}}>â€¢</span><span>{iFmt(line.slice(2))}</span></div>);i++;continue;}
+    if(/^[-*•] /.test(line)){out.push(<div key={`md-bullet-${i}-${line.slice(2,12)}`} style={{display:"flex",gap:6,marginTop:2}}><span style={{color:faint,flexShrink:0}}>•</span><span>{iFmt(line.slice(2))}</span></div>);i++;continue;}
     if(/^\d+\. /.test(line)){const n=line.match(/^(\d+)\. /)[1];out.push(<div key={`md-number-${i}-${n}`} style={{display:"flex",gap:6,marginTop:2}}><span style={{color:faint,flexShrink:0,minWidth:14}}>{n}.</span><span>{iFmt(line.replace(/^\d+\. /,""))}</span></div>);i++;continue;}
     if(line.startsWith("> ")){out.push(<div key={`md-quote-${i}-${line.slice(2,12)}`} style={{borderLeft:`2px solid ${faint}`,paddingLeft:10,margin:"4px 0",color:faint,fontSize:12,fontStyle:"italic"}}>{iFmt(line.slice(2))}</div>);i++;continue;}
     if(/^---+$/.test(line.trim())){out.push(<hr key={`md-hr-${i}-${line.length}`} style={{border:"none",borderTop:"1px solid #2a2a3a",margin:"8px 0"}}/>);i++;continue;}
@@ -591,7 +591,7 @@ function KeyRow({ api, T, value, onChange }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           model: modelByApi[api.id] || "meta-llama/llama-3.3-70b-instruct:free",
-          messages: [{ role: "user", content: "olÃ¡" }],
+          messages: [{ role: "user", content: "olá" }],
           max_tokens: 5,
         }),
       });
@@ -639,7 +639,7 @@ function KeyRow({ api, T, value, onChange }) {
           style={{ flex: 1, background: T.s1, border: `1px solid ${T.b1}`, borderRadius: 8, padding: "5px 0",
             cursor: "pointer", fontSize: 10, fontFamily: "inherit", fontWeight: status ? 700 : 400,
             color: status === "ok" ? "#10b981" : status === "err" ? "#ef4444" : T.ts }}>
-          {status === "testing" ? "A testar..." : status === "ok" ? "VÃ¡lida" : status === "err" ? "InvÃ¡lida" : "Testar"}
+          {status === "testing" ? "A testar..." : status === "ok" ? "Válida" : status === "err" ? "Inválida" : "Testar"}
         </button>
         <button onClick={() => onChange(draft)} disabled={!dirty}
           style={{ flex: 1, background: dirty ? `${api.color}22` : T.s1,
@@ -894,7 +894,7 @@ export default function Cortex(){
     }
   };
 
-  // Bloqueio automÃ¡tico das chaves ao navegar para outra pÃ¡gina
+  // Bloqueio automático das chaves ao navegar para outra página
   useEffect(()=>{if(page!=="keys"&&!DEV_MODE)setDevUnlocked(false);},[page]);
 
   useEffect(()=>{
@@ -999,7 +999,7 @@ async function handleFileUpload(ficheiro) {
       uploadPreviewUrlsRef.current.add(previewUrl);
       anexo = { ...ficheiro, previewUrl };
     } catch {
-      // MantÃ©m o painel montado para preservar a URL de objecto original se a cÃ³pia falhar.
+      // Mantém o painel montado para preservar a URL de objecto original se a cópia falhar.
     }
   }
 
@@ -1032,7 +1032,7 @@ async function send(query, options = {}) {
   let qComFicheiro = q;
 
   if (ficheiroAnexado?.conteudo) {
-    qComFicheiro = `[Ficheiro: ${ficheiroAnexado.nome}]\n[ConteÃºdo]:\n${ficheiroAnexado.conteudo.slice(0, 12000)}\n\nPergunta do utilizador: ${q}`;
+    qComFicheiro = `[Ficheiro: ${ficheiroAnexado.nome}]\n[Conteúdo]:\n${ficheiroAnexado.conteudo.slice(0, 12000)}\n\nPergunta do utilizador: ${q}`;
   } else if (ficheiroAnexado?.previewUrl) {
     qComFicheiro = `[Imagem anexada: ${ficheiroAnexado.nome}]\n\nPergunta do utilizador: ${q}`;
   }
@@ -1116,45 +1116,45 @@ async function send(query, options = {}) {
   }
 
   function exportConv(){
-    const lines=[`# Conversa â€” ${"Bem-vindo ao CÃ³rtex"}`,`> ${new Date().toLocaleString()}`,""];
+    const lines=[`# Conversa — ${"Bem-vindo ao Córtex"}`,`> ${new Date().toLocaleString()}`,""];
     msgs.forEach(m=>{
       if(m.role==="user")lines.push(`## ðŸ§‘ Tu`,m.content,"");
       else if(m.systemNote)lines.push(`> ${m.content}`,"");
-      else{lines.push(`## ðŸ§  CÃ³rtex`,m.content,"");if(m.councilDecision)lines.push(`> âš– ${m.councilDecision}`,"");}
+      else{lines.push(`## 🧠 Córtex`,m.content,"");if(m.councilDecision)lines.push(`> ⚖ ${m.councilDecision}`,"");}
     });
     const md=lines.join("\n");
     navigator.clipboard?.writeText(md);
     const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([md],{type:"text/markdown"}));a.download=`cortex-${Date.now()}.md`;a.click();
-    toast("RelatÃ³rio exportado","success");
+    toast("Relatório exportado","success");
   }
 
   function applySeed(){
     const entries=[...seedToMem(seedP,"facto"),...seedToMem(seedC,"facto"),...seedToMem(seedO,"objetivo")];
     if(!entries.length)return;
-    const nb={...brain,semantic:[...brain.semantic,...entries].slice(-MAX_SEMANTIC),episodic:[...brain.episodic,"ConfiguraÃ§Ã£o inicial (seed manual)."].slice(-MAX_EPISODIC)};
+    const nb={...brain,semantic:[...brain.semantic,...entries].slice(-MAX_SEMANTIC),episodic:[...brain.episodic,"Configuração inicial (seed manual)."].slice(-MAX_EPISODIC)};
     setBrain(nb);saveBrain(nb);setShowSeed(false);setSeedP("");setSeedC("");setSeedO("");
-    toast("MemÃ³ria guardada","success");
+    toast("Memória guardada","success");
   }
 
   function doImport(){
     setImportErr("");
     try{
       const raw=JSON.parse(importTxt);
-      if(!Array.isArray(raw.semantic)||!Array.isArray(raw.episodic))throw new Error("Formato invÃ¡lido.");
+      if(!Array.isArray(raw.semantic)||!Array.isArray(raw.episodic))throw new Error("Formato inválido.");
       setBrain(normBrain(raw));saveBrain(normBrain(raw));setBuf([]);setShowImport(false);setImportTxt("");
-      toast("MemÃ³ria importada","success");
+      toast("Memória importada","success");
     }catch(e){setImportErr(`Erro: ${e.message}`);}
   }
 
   const phases={
-    geracao:{label:"Fase Alpha Â· Lobos",color:"#a78bfa",pct:"38%"},
-    critica:{label:"Fase Beta Â· CrÃ­tica cruzada",color:AC.perp,pct:"68%"},
-    sintese:{label:"Fase Ã“mega Â· SÃ­ntese Claude",color:AC.claude,pct:"88%"},
+    geracao:{label:"Fase Alpha · Lobos",color:"#a78bfa",pct:"38%"},
+    critica:{label:"Fase Beta · Crítica cruzada",color:AC.perp,pct:"68%"},
+    sintese:{label:"Fase Ã“mega · Síntese Claude",color:AC.claude,pct:"88%"},
     council:{label:`Conselho de Lobos (${LOBOS.filter(l=>modelsOn[l.id]!==false).length})`,color:"#a78bfa",pct:"50%"},
-    judges:{label:"JuÃ­zes", color:AC.perp, pct:"68%"},
+    judges:{label:"Juízes", color:AC.perp, pct:"68%"},
     rei:{label:"Veredicto do Rei", color:AC.claude, pct:"88%"},
-    cortex: {label:"CÃ³rtex", color:AC.claude, pct:"88%"},
-    reflex: {label:"ReflexÃ£o", color:AC.reflex, pct:"100%"},
+    cortex: {label:"Córtex", color:AC.claude, pct:"88%"},
+    reflex: {label:"Reflexão", color:AC.reflex, pct:"100%"},
   };
 
 const safeParseJson = (value, fallback = null) => {
@@ -1197,7 +1197,7 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
       final: fallbackText || "Sem resposta estruturada.",
       consensus: [],
       divergence: [],
-      confidence: "mÃ©dia",
+      confidence: "média",
       nextActions: []
     };
   }
@@ -1210,7 +1210,7 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
       final: raw,
       consensus: [],
       divergence: [],
-      confidence: "mÃ©dia",
+      confidence: "média",
       nextActions: []
     };
   }
@@ -1227,7 +1227,7 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
     final,
     consensus: Array.isArray(raw.consensus) ? raw.consensus : [],
     divergence: Array.isArray(raw.divergence) ? raw.divergence : [],
-    confidence: raw.confidence || "mÃ©dia",
+    confidence: raw.confidence || "média",
     nextActions: Array.isArray(raw.nextActions)
       ? raw.nextActions
       : Array.isArray(raw.next_actions)
@@ -1303,36 +1303,36 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
         }
       `}</style>
 
-      {/* â”€â”€ NOTIFICAÃ‡Ã•ES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      {/* â”€â”€ NOTIFICAÇÕES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <Toast toasts={toasts} onFechar={removerToast} />
 
       {/* â”€â”€ MODAIS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       {showGuide && (
         <Modal T={T} title={"Guia"} onClose={()=>setShowGuide(false)}>
           <div style={{fontSize:12,lineHeight:1.8,color:T.ts,display:"flex",flexDirection:"column",gap:10}}>
-            <p><b style={{color:T.tx}}>{"O Conselho"}</b><br/>{"DiscussÃ£o entre diferentes perspectivas de IA."}</p>
+            <p><b style={{color:T.tx}}>{"O Conselho"}</b><br/>{"Discussão entre diferentes perspectivas de IA."}</p>
             <div style={{display:"grid",gridTemplateColumns:"auto 1fr auto",gap:"3px 10px",background:T.s2,borderRadius:10,padding:11,fontSize:11}}>
-              {[["â—‰ Grok","Factos empÃ­ricos","grok-3"],["â—ˆ Gemini","Contexto amplo","gemini-2.5-flash"],["â—‡ Perplexity","Web actual","sonar-pro"],["â—Ž Genspark","SÃ­ntese multi-IA","simulado"],["â— Manus","Agente autÃ³nomo","via Claude"],["â—‹ OpenAI","RaciocÃ­nio","gpt-4o"],["â— DeepSeek","CÃ³digo/LÃ³gica","deepseek-chat"],["â—‘ Llama","CÃ³digo aberto","llama-4-scout"],["â—’ Mistral","Velocidade","mistral-large"],["â—“ Nemotron","CiÃªncia","nemotron-4-340b"],["â—† Claude","Juiz final","claude-opus-4-6"]].map(([l,d,v],i)=>(
+              {[["â—‰ Grok","Factos empíricos","grok-3"],["◈ Gemini","Contexto amplo","gemini-2.5-flash"],["â—‡ Perplexity","Web actual","sonar-pro"],["â—Ž Genspark","Síntese multi-IA","simulado"],["â— Manus","Agente autónomo","via Claude"],["â—‹ OpenAI","Raciocínio","gpt-4o"],["â— DeepSeek","Código/Lógica","deepseek-chat"],["â—‘ Llama","Código aberto","llama-4-scout"],["â—’ Mistral","Velocidade","mistral-large"],["â—“ Nemotron","Ciência","nemotron-4-340b"],["â—† Claude","Juiz final","claude-opus-4-6"]].map(([l,d,v],i)=>(
                 <span key={`model-info-${i}-${l}`} style={{display:"contents"}}><span style={{fontWeight:700,color:T.tx}}>{l}</span><span>{d}</span><span style={{color:T.tf,fontFamily:"monospace",fontSize:8}}>{v}</span></span>
               ))}
             </div>
-            <p><b style={{color:T.tx}}>{"O CÃ³rtex"}</b><br/>{"IntegraÃ§Ã£o final do conhecimento."}</p>
-            <p><b style={{color:T.tx}}>{"MemÃ³ria"}</b><br/>{"RetenÃ§Ã£o a longo prazo e RAG."}</p>
+            <p><b style={{color:T.tx}}>{"O Córtex"}</b><br/>{"Integração final do conhecimento."}</p>
+            <p><b style={{color:T.tx}}>{"Memória"}</b><br/>{"Retenção a longo prazo e RAG."}</p>
             <p style={{color:T.tf,fontSize:10}}>{"Dica: usa o microfone para falares com o sistema."}</p>
           </div>
         </Modal>
       )}
 
       {showExport && (
-        <Modal T={T} title={"Exportar MemÃ³ria"} onClose={()=>setShowExport(false)}>
-          <p style={{fontSize:11,color:T.ts,marginBottom:7}}>{"JSON do teu cÃ©rebro:"}</p>
+        <Modal T={T} title={"Exportar Memória"} onClose={()=>setShowExport(false)}>
+          <p style={{fontSize:11,color:T.ts,marginBottom:7}}>{"JSON do teu cérebro:"}</p>
           <textarea readOnly value={JSON.stringify(normBrain(brain),null,2)} onClick={e=>e.target.select()} style={{width:"100%",height:180,background:T.s2,border:`1px solid ${T.b1}`,borderRadius:8,padding:9,color:T.tx,fontSize:10,fontFamily:"monospace",resize:"vertical",outline:"none",boxSizing:"border-box"}}/>
           <button onClick={()=>navigator.clipboard?.writeText(JSON.stringify(normBrain(brain),null,2)).then(()=>toast("Copiado","success"))} style={{...btn(T,AC.claude),marginTop:7,width:"100%"}}>{"ðŸ“‹ Copiar"}</button>
         </Modal>
       )}
 
       {showImport && (
-        <Modal T={T} title={"Importar MemÃ³ria"} onClose={()=>{setShowImport(false);setImportErr("");setImportTxt("");}}>
+        <Modal T={T} title={"Importar Memória"} onClose={()=>{setShowImport(false);setImportErr("");setImportTxt("");}}>
           <textarea value={importTxt} onChange={e=>setImportTxt(e.target.value)} placeholder={'{"episodic":[],"semantic":[],...}'} style={{width:"100%",height:180,background:T.s2,border:`1px solid ${T.b1}`,borderRadius:8,padding:9,color:T.tx,fontSize:10,fontFamily:"monospace",resize:"vertical",outline:"none",boxSizing:"border-box"}}/>
           {importErr && <div style={{color:"#fca5a5",fontSize:11,marginTop:4}}>{importErr}</div>}
           <button onClick={doImport} style={{...btn(T,AC.claude),marginTop:7,width:"100%"}}>{"âœ“ Importar e substituir"}</button>
@@ -1340,11 +1340,11 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
       )}
 
       {showSeed && (
-        <Modal T={T} title={"Semente da MemÃ³ria"} onClose={()=>setShowSeed(false)}>
+        <Modal T={T} title={"Semente da Memória"} onClose={()=>setShowSeed(false)}>
           <div style={{display:"flex",flexDirection:"column",gap:11}}>
-            {[["Perfil pessoal","Curso, contexto, preferÃªncias e forma de trabalho...",seedP,setSeedP],
-              ["Contexto tÃ©cnico","Projectos, stack, ferramentas e restriÃ§Ãµes importantes...",seedC,setSeedC],
-              ["Objectivos","Objectivos actuais, prioridades e prÃ³ximos passos...",seedO,setSeedO]
+            {[["Perfil pessoal","Curso, contexto, preferências e forma de trabalho...",seedP,setSeedP],
+              ["Contexto técnico","Projectos, stack, ferramentas e restrições importantes...",seedC,setSeedC],
+              ["Objectivos","Objectivos actuais, prioridades e próximos passos...",seedO,setSeedO]
             ].map(([lbl,ph,val,set])=>(
               <div key={lbl} style={{display:"flex",flexDirection:"column",gap:4}}>
                 <label style={{fontSize:11,fontWeight:600,color:T.ts}}>{lbl}</label>
@@ -1415,7 +1415,7 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
         </Modal>
       )}
 
-      {/* â”€â”€ NAVEGAÃ‡ÃƒO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      {/* â”€â”€ NAVEGAÇÃO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
 <nav style={{display:"grid",gridTemplateColumns:isMobile?"1fr auto":"minmax(260px,1fr) auto",alignItems:"center",minHeight:64,padding:"8px 12px",background:`linear-gradient(180deg, ${T.s1}, ${T.bg})`,borderBottom:`1px solid ${AC.claude}44`,gap:12,flexShrink:0,boxShadow:`0 8px 24px ${T.b2}66`}}>
   <button
     type="button"
@@ -1426,7 +1426,7 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
     <div style={{width:40,height:40,borderRadius:12,background:`linear-gradient(135deg, ${AC.claude}33, ${AC.claude}12)`,border:`1px solid ${AC.claude}55`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:900,color:AC.claude,letterSpacing:0.5,boxShadow:`0 0 18px ${AC.claude}22`,flexShrink:0}}>CD</div>
     <div style={{minWidth:0}}>
       <div style={{display:"flex",alignItems:"baseline",gap:7,flexWrap:"wrap"}}>
-        <div style={{fontSize:15,fontWeight:900,letterSpacing:0.6,color:T.tx,lineHeight:1}}>{"CÃ³rtex"}</div>
+        <div style={{fontSize:15,fontWeight:900,letterSpacing:0.6,color:T.tx,lineHeight:1}}>{"Córtex"}</div>
         <span style={{fontSize:10,fontWeight:800,color:AC.claude,letterSpacing:0.4}}>{MV.split("-")[1]}</span>
       </div>
       <div style={{fontSize:10,color:T.ts,marginTop:5,letterSpacing:0.2,whiteSpace:"normal"}}>{"Plataforma multi-agente"}</div>
@@ -1434,7 +1434,7 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
   </button>
 
   <div style={{display:"flex",alignItems:"center",justifyContent:"flex-end",gap:6,overflowX:"auto",WebkitOverflowScrolling:"touch",paddingBottom:1}}>
-    {!isMobile && [["chat","â–£","Chat"],...(DEV_MODE?[["keys","ðŸ”‘","Chaves API"]]:[]),["memory","ðŸ§ ","MemÃ³ria"],["settings","âš™","DefiniÃ§Ãµes"]].map(([p,ico,lbl],idx)=>{
+    {!isMobile && [["chat","â–£","Chat"],...(DEV_MODE?[["keys","🔑","Chaves API"]]:[]),["memory","🧠","Memória"],["settings","âš™","Definições"]].map(([p,ico,lbl],idx)=>{
       const active=page===p&&pagina!=="blueprints";
       return (
         <button
@@ -1472,13 +1472,13 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
         style={{background:modoCode?"var(--accent)":"transparent",border:`1px solid ${modoCode?"var(--accent)":T.b1}`,borderRadius:12,minHeight:42,padding:"8px 13px",transition:"all 220ms cubic-bezier(0.4,0,0.2,1)",boxShadow:modoCode?"0 0 16px var(--accent-bg)":"none",color:modoCode?"white":"var(--text-secondary, #8a8aa0)",cursor:"pointer",fontSize:12,fontFamily:"inherit",fontWeight:modoCode?800:600,display:"flex",alignItems:"center",gap:7,flexShrink:0}}
         title={"Modo Code Agent"}
       >
-        {"ðŸ’» CÃ³digo"}
+        {"ðŸ’» Código"}
       </button>
     )}
 
     {!isMobile && (
       <>
-        <button type="button" onClick={()=>setShowModels(true)} style={{...navBtn(T),minWidth:42,minHeight:42,background:T.s2}} title={"Lobos"}>â—ˆ</button>
+        <button type="button" onClick={()=>setShowModels(true)} style={{...navBtn(T),minWidth:42,minHeight:42,background:T.s2}} title={"Lobos"}>◈</button>
         <button type="button" onClick={()=>setShowTP(true)} style={{...navBtn(T),minWidth:42,minHeight:42,background:T.s2}} title={"Tema"}>{THEMES[theme].emoji}</button>
         <button type="button" onClick={()=>setShowGuide(true)} style={{...navBtn(T),minWidth:42,minHeight:42,background:T.s2}} title={"Guia"}>?</button>
       </>
@@ -1488,7 +1488,7 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
       type="button"
       onClick={()=>setShowSidebar(v=>!v)}
       style={{...navBtn(T),minWidth:42,minHeight:42,background:showSidebar?`${AC.claude}22`:T.s2,borderColor:showSidebar?`${AC.claude}55`:T.b1}}
-      title={"HistÃ³rico"}
+      title={"Histórico"}
     >
       â˜°
     </button>
@@ -1502,19 +1502,19 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
       {page==="chat" && (
         <>
         <>
-  <SidePanel aberto={showSidebar} onFechar={()=>setShowSidebar(false)} titulo={"HistÃ³rico"}>
+  <SidePanel aberto={showSidebar} onFechar={()=>setShowSidebar(false)} titulo={"Histórico"}>
     <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:10,marginBottom:10}}>
       <span style={{fontSize:11,color:T.ts}}>{conversations.length} {"Conversas"}</span>
       <button onClick={newChat} style={{...btn(T,AC.claude),fontSize:9,padding:"4px 10px"}}>{"Nova Conversa"}</button>
     </div>
     <div style={{display:"flex",flexDirection:"column",gap:6}}>
       {conversations.length===0
-        ?<div style={{fontSize:11,color:T.tf,textAlign:"center",marginTop:24,lineHeight:1.8}}>Sem histÃ³rico<br/>Cria uma nova conversa para comeÃ§ar.</div>
+        ?<div style={{fontSize:11,color:T.tf,textAlign:"center",marginTop:24,lineHeight:1.8}}>Sem histórico<br/>Cria uma nova conversa para começar.</div>
         :conversations.map((conv,idx)=>(
           <div key={`conversation-${idx}-${conv.id}`} onClick={()=>switchConv(conv)} style={{background:conv.id===currentConvId?`${AC.claude}18`:T.s2,border:`1px solid ${conv.id===currentConvId?AC.claude+"44":T.b1}`,borderRadius:10,padding:"9px 10px",cursor:"pointer",display:"flex",alignItems:"flex-start",gap:8,transition:"background 0.2s, border-color 0.2s"}}>
             <div style={{flex:1,minWidth:0}}>
               <div style={{fontSize:11,fontWeight:700,color:T.tx,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{conv.title}</div>
-              <div style={{fontSize:9,color:T.ts,marginTop:3}}>{conv.msgs?.filter(m=>m.role==="user").length || 0} mensagens Â· {new Date(conv.updatedAt).toLocaleDateString("pt-PT")}</div>
+              <div style={{fontSize:9,color:T.ts,marginTop:3}}>{conv.msgs?.filter(m=>m.role==="user").length || 0} mensagens · {new Date(conv.updatedAt).toLocaleDateString("pt-PT")}</div>
             </div>
             <button onClick={e=>deleteConv(conv.id,e)} aria-label="Apagar conversa" style={{background:"transparent",border:"none",color:T.tf,cursor:"pointer",fontSize:12,flexShrink:0,opacity:0.65,padding:2,lineHeight:1}}>âœ•</button>
           </div>
@@ -1522,7 +1522,7 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
       }
     </div>
     <div style={{marginTop:12,paddingTop:10,borderTop:`1px solid ${T.b1}`,fontSize:9,color:T.tf,lineHeight:1.6}}>
-      {"Nota de memÃ³ria"}
+      {"Nota de memória"}
     </div>
   </SidePanel>
   <SidePanel
@@ -1640,7 +1640,7 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
           <div style={{width:5,height:5,borderRadius:"50%",background:(active||done)?cor:"#444",boxShadow:active?`0 0 6px ${cor}`:"none",transition:"all 0.3s"}} className={active?"pulse":""}/>
           <span style={{color:(active||done)?cor:T.ts,fontWeight:active?700:400,letterSpacing:1,opacity:(active||done)?1:0.7}}>{lobeLabel(l)}</span>
         </div>
-        {i<LOBOS.length-1&&<span style={{color:T.ts,opacity:0.15}}>Â·</span>}
+        {i<LOBOS.length-1&&<span style={{color:T.ts,opacity:0.15}}>·</span>}
       </div>;
     })}
     <div style={{marginLeft:"auto",display:"flex",gap:7,color:T.tf,flexShrink:0}}>
@@ -1721,14 +1721,14 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
           {[
             {
               key:"memory",
-              icon:"ðŸ§ ",
-              label:"MemÃ³ria",
+              icon:"🧠",
+              label:"Memória",
               active:page==="memory",
               onClick:()=>{setPage("memory");setFabOpen(false);}
             },
             {
               key:"models",
-              icon:"â—ˆ",
+              icon:"◈",
               label:"Modelos",
               active:showModels,
               onClick:()=>{setShowModels(true);setFabOpen(false);}
@@ -1757,7 +1757,7 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
             {
               key:"code",
               icon:"ðŸ’»",
-              label:"CÃ³digo",
+              label:"Código",
               active:modoCode,
               onClick:()=>{setModoCode((m) => !m);setFabOpen(false);}
             }
@@ -1833,17 +1833,17 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
             {msgs.length===0 ? (
               <div style={{minHeight:"80%",display:"flex",flexDirection:"column",justifyContent:"center"}}>
                 <EstadoVazio
-                  titulo={"Bem-vindo ao CÃ³rtex"}
-                  subtitulo={`${"O que vamos explorar hoje?"} ${"Lobos oficiais"} Â· ${"Veredicto"} Rei/Codex`}
+                  titulo={"Bem-vindo ao Córtex"}
+                  subtitulo={`${"O que vamos explorar hoje?"} ${"Lobos oficiais"} · ${"Veredicto"} Rei/Codex`}
                   sugestoes={sugestoesIniciais}
                   onSugestao={aplicarSugestaoRei}
                 />
                 <div style={{display:"flex",justifyContent:"center",alignItems:"center",gap:12,fontSize:10,color:T.ts}}>
                   {brain.semantic.length>0
-                    ?<span>ðŸ§  {brain.semantic.length} {"Factos".toLowerCase()} Â· {brain.sessions} {"SessÃµes".toLowerCase()}</span>
-                    :<button onClick={()=>setShowSeed(true)} style={{...btn(T,AC.genspark),fontSize:10,padding:"4px 10px"}}>{"Configurar o CÃ©rebro"}</button>
+                    ?<span>🧠 {brain.semantic.length} {"Factos".toLowerCase()} · {brain.sessions} {"Sessões".toLowerCase()}</span>
+                    :<button onClick={()=>setShowSeed(true)} style={{...btn(T,AC.genspark),fontSize:10,padding:"4px 10px"}}>{"Configurar o Cérebro"}</button>
                   }
-                  {conversations.length>0&&<span style={{color:T.tf}}>Â· {conversations.length} {"Conversas"}</span>}
+                  {conversations.length>0&&<span style={{color:T.tf}}>· {conversations.length} {"Conversas"}</span>}
                 </div>
               </div>
             ) : (
@@ -1876,7 +1876,7 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
                 {cur&&(
                   <div style={{display:"flex",justifyContent:"flex-start"}}>
                     <div style={{background:T.s1,border:`1px solid ${T.b1}`,borderRadius:"3px 18px 18px 18px",padding:"14px 16px",minWidth:240,maxWidth:"80%",boxShadow:`0 2px 12px ${T.b2}88`}}>
-                      {/* RÃ³tulo da fase */}
+                      {/* Rótulo da fase */}
                       <div style={{display:"flex",alignItems:"center",gap:7,marginBottom:10}}>
                         <div style={{display:"flex",gap:2}}>{LOBOS.map((l,index)=><div key={`lobe-${l.id}-${index}`} style={{width:5,height:5,borderRadius:"50%",background:lobeColor(l),opacity:(phase==="geracao"||phase==="council")?1:0.08,transition:"opacity 0.5s"}} className={(phase==="geracao"||phase==="council")?"pulse":""}/>)}</div>
                         <span style={{fontSize:10,color:cur.color,fontWeight:600,letterSpacing:1}}>{cur.label}</span>
@@ -1926,7 +1926,7 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
               <div style={{maxWidth:820,margin:"0 auto 8px"}}>
                 <AlertaBanner
                   tipo="info"
-                  mensagem={aStreaming ? "Streaming a correr â€” respostas parciais dos lobos." : "Modo debate activo â€” os lobos fazem segunda ronda antes do Rei."}
+                  mensagem={aStreaming ? "Streaming a correr — respostas parciais dos lobos." : "Modo debate activo — os lobos fazem segunda ronda antes do Rei."}
                 />
               </div>
             )}
@@ -1942,7 +1942,7 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
                       setCurrentApprovalGate(null);
                     }} style={btn(T, "#ef4444")}>Confirmar</button>
                     <button onClick={()=>setCurrentApprovalGate(null)} style={btn(T, T.ts)}>Cancelar</button>
-                    <button onClick={()=>toast("Esta acÃ§Ã£o pode remover dados permanentemente.", "info")} style={btn(T, AC.gemini)}>Ver impacto</button>
+                    <button onClick={()=>toast("Esta acção pode remover dados permanentemente.", "info")} style={btn(T, AC.gemini)}>Ver impacto</button>
                   </div>
                 </AlertaBanner>
               </div>
@@ -2004,7 +2004,7 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
         fontVariantNumeric:"tabular-nums",
       }}
     >
-      {inputChars} chars Â· ~{inputTokens} tokens
+      {inputChars} chars · ~{inputTokens} tokens
     </div>
   </div>
   <div style={{display:"flex",gap:3,alignItems:"flex-end",flexShrink:0}}>
@@ -2017,12 +2017,12 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
       <button onClick={exportConv} style={{background:"transparent",border:"none",borderRadius:8,width:30,height:30,cursor:"pointer",fontSize:13,color:T.ts,display:"flex",alignItems:"center",justifyContent:"center",transition:"all 0.18s",opacity:0.75}} onMouseEnter={e=>{e.currentTarget.style.opacity="1";e.currentTarget.style.color=AC.gemini;}} onMouseLeave={e=>{e.currentTarget.style.opacity="0.75";e.currentTarget.style.color=T.ts;}} title={"Exportar"}>â†“</button>}
   </div>
 </div>
-              {/* botÃ£o enviar / parar */}
+              {/* botão enviar / parar */}
               {isGenerating ? (
                 <button
                   type="button"
                   onClick={stopGeneration}
-                  title="Parar geraÃ§Ã£o"
+                  title="Parar geração"
                   style={{background:"rgba(239,68,68,0.18)",border:"1px solid rgba(239,68,68,0.44)",borderRadius:14,minWidth:72,height:44,cursor:"pointer",fontSize:12,fontWeight:800,color:"#fecaca",transition:"background 0.2s, box-shadow 0.2s, opacity 0.2s",display:"flex",alignItems:"center",justifyContent:"center",gap:6,boxShadow:"0 0 16px rgba(239,68,68,0.25)",flexShrink:0,fontFamily:"inherit"}}
                 >â–  Parar</button>
               ) : (
@@ -2034,7 +2034,7 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
                   onMouseLeave={e=>{if(input.trim()&&!phase)e.currentTarget.style.background="var(--accent)";}}
                 >â–¶</button>
               )}
-              {/* botÃ£o nova conversa */}
+              {/* botão nova conversa */}
               <button onClick={newChat} title={"Nova Conversa"} style={{background:T.s2,border:`1px solid ${T.b1}`,borderRadius:14,width:44,height:44,cursor:"pointer",fontSize:16,color:T.ts,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,transition:"all 0.15s"}} onMouseEnter={e=>{e.currentTarget.style.borderColor=AC.claude+"66";e.currentTarget.style.color=AC.claude;}} onMouseLeave={e=>{e.currentTarget.style.borderColor=T.b1;e.currentTarget.style.color=T.ts;}}>+</button>
             </div>
             {buf.length>0&&<div style={{fontSize:8,color:T.tf,textAlign:"center",marginTop:4}}>{`${buf.length} / ${MAX_BUF} tokens`}</div>}
@@ -2063,7 +2063,7 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
     </div>
     <div style={{display:"flex",flexDirection:"column",gap:8,width:"100%",maxWidth:280}}>
       <input type="password" value={pinInput} onChange={e=>{setPinInput(e.target.value);setPinErr(false);}} onKeyDown={e=>{if(e.key==="Enter"){if(pinInput===getDevPin()){setDevUnlocked(true);setPinInput("");}else{setPinErr(true);setPinInput("");}}} } placeholder={"PIN"} maxLength={12} style={{background:T.s2,border:`1px solid ${pinErr?"#ef4444":T.b1}`,borderRadius:12,padding:"10px 14px",color:T.tx,fontSize:14,fontFamily:"monospace",outline:"none",textAlign:"center",letterSpacing:4}} autoFocus/>
-      {pinErr&&<div style={{fontSize:10,color:"#ef4444",textAlign:"center"}}>{"PIN invÃ¡lido"}</div>}
+      {pinErr&&<div style={{fontSize:10,color:"#ef4444",textAlign:"center"}}>{"PIN inválido"}</div>}
       <button onClick={()=>{if(pinInput===getDevPin()){setDevUnlocked(true);setPinInput("");setPinErr(false);}else{setPinErr(true);setPinInput("");}}} style={{background:`${AC.claude}22`,border:`1px solid ${AC.claude}44`,borderRadius:10,padding:"8px 0",color:AC.claude,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>{"Entrar"}</button>
     </div>
     <div style={{fontSize:9,color:T.tf,textAlign:"center",maxWidth:240}}>{"O PIN protege as chaves da API de acessos indevidos no browser."}</div>
@@ -2076,18 +2076,18 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
       <h2 style={{margin:0,fontSize:14,fontWeight:800,color:T.tx}}>{"Gestor de Chaves API"}</h2>
       <button onClick={()=>{setDevUnlocked(false);setPinInput("");}} style={{fontSize:9,color:T.ts,background:"transparent",border:`1px solid ${T.b1}`,borderRadius:6,padding:"3px 8px",cursor:"pointer",fontFamily:"inherit"}}>{"Bloquear"}</button>
     </div>
-    <p style={{margin:0,fontSize:11,color:T.ts}}>{"As tuas chaves sÃ£o encriptadas e guardadas apenas no teu localStorage."}</p>
+    <p style={{margin:0,fontSize:11,color:T.ts}}>{"As tuas chaves são encriptadas e guardadas apenas no teu localStorage."}</p>
     {[
-      {id:"grok",    label:"Grok",           color:AC.grok,             link:"console.x.ai",               ph:"xai-...",     desc:"GrÃ¡tis Â· grok-3"},
-      {id:"gemini",  label:"Gemini",         color:AC.gemini,           link:"aistudio.google.com/apikey",  ph:"AIza...",     desc:"GrÃ¡tis Â· gemini-2.5-flash"},
-      {id:"perp",    label:"Groq (Lobo Web)",color:AC.perp,             link:"console.groq.com",            ph:"gsk_...",     desc:"GrÃ¡tis Â· llama-3.3-70b"},
+      {id:"grok",    label:"Grok",           color:AC.grok,             link:"console.x.ai",               ph:"xai-...",     desc:"Grátis · grok-3"},
+      {id:"gemini",  label:"Gemini",         color:AC.gemini,           link:"aistudio.google.com/apikey",  ph:"AIza...",     desc:"Grátis · gemini-2.5-flash"},
+      {id:"perp",    label:"Groq (Lobo Web)",color:AC.perp,             link:"console.groq.com",            ph:"gsk_...",     desc:"Grátis · llama-3.3-70b"},
       {id:"openai",  label:"OpenAI",         color:AC.openai||"#74aa9c",link:"platform.openai.com/api-keys",ph:"sk-proj-...", desc:"gpt-4o"},
       {id:"deepseek",label:"DeepSeek",       color:AC.deepseek||"#4d9fff",link:"platform.deepseek.com",    ph:"sk-...",      desc:"deepseek-chat"},
       {id:"llama",   label:"Llama (Groq)",   color:AC.llama||"#e879f9", link:"console.groq.com/keys",       ph:"gsk_...",     desc:"llama-4-scout via Groq"},
       {id:"mistral", label:"Mistral",        color:AC.mistral||"#f97316",link:"console.mistral.ai/api-keys",ph:"...",         desc:"mistral-large-latest"},
-      {id:"genspark", label:"Genspark",  color:AC.genspark, link:"www.genspark.ai/settings/api",  ph:"gs-...",     desc:"SÃ­ntese multi-IA"},
-      {id:"manus",    label:"Manus",     color:AC.manus,    link:"manus.im",                       ph:"manus-...",  desc:"Agente autÃ³nomo"},
-      {id:"claude",  label:"Claude",         color:AC.claude,           link:"console.anthropic.com",       ph:"sk-ant-...",  desc:"Pago Â· claude-sonnet"},
+      {id:"genspark", label:"Genspark",  color:AC.genspark, link:"www.genspark.ai/settings/api",  ph:"gs-...",     desc:"Síntese multi-IA"},
+      {id:"manus",    label:"Manus",     color:AC.manus,    link:"manus.im",                       ph:"manus-...",  desc:"Agente autónomo"},
+      {id:"claude",  label:"Claude",         color:AC.claude,           link:"console.anthropic.com",       ph:"sk-ant-...",  desc:"Pago · claude-sonnet"},
     ].map((api,idx)=>(
       <KeyRow key={`api-${idx}-${api.id}`} api={api} T={T} value={keys[api.id]||""} onChange={v=>{
         const nk={...keys,[api.id]:v};setKeys(nk);saveKeys(nk);
@@ -2099,13 +2099,13 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
       {page==="memory" && (
         <div style={{flex:1,overflowY:"auto",padding:13,display:"flex",flexDirection:"column",gap:11,maxWidth:700,width:"100%",margin:"0 auto",boxSizing:"border-box"}}>
           <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:7}}>
-            <div><h2 style={{margin:0,fontSize:14,fontWeight:800,color:T.tx}}>{"Banco de MemÃ³ria"}</h2><p style={{margin:"2px 0 0",fontSize:10,color:T.ts}}>{"EpisÃ³dica, semÃ¢ntica e padrÃµes de raciocÃ­nio."}</p></div>
+            <div><h2 style={{margin:0,fontSize:14,fontWeight:800,color:T.tx}}>{"Banco de Memória"}</h2><p style={{margin:"2px 0 0",fontSize:10,color:T.ts}}>{"Episódica, semântica e padrões de raciocínio."}</p></div>
             <div style={{display:"flex",gap:5,flexWrap:"wrap"}}>
-              {[[()=>setShowSeed(true),AC.genspark,"Semente"],[()=>setShowExport(true),AC.perp,"Exportar"],[()=>setShowImport(true),AC.gemini,"Importar"],[()=>{if(confirm("Apagar TODA a memÃ³ria?")){setBrain(defaultBrain);saveBrain(defaultBrain);setBuf([]);}},  "#ef4444","Apagar"]].map(([fn,c,lbl],i)=><button key={`memory-action-${i}-${lbl}`} onClick={fn} style={{...btn(T,c),padding:"4px 8px"}}>{lbl}</button>)}
+              {[[()=>setShowSeed(true),AC.genspark,"Semente"],[()=>setShowExport(true),AC.perp,"Exportar"],[()=>setShowImport(true),AC.gemini,"Importar"],[()=>{if(confirm("Apagar TODA a memória?")){setBrain(defaultBrain);saveBrain(defaultBrain);setBuf([]);}},  "#ef4444","Apagar"]].map(([fn,c,lbl],i)=><button key={`memory-action-${i}-${lbl}`} onClick={fn} style={{...btn(T,c),padding:"4px 8px"}}>{lbl}</button>)}
             </div>
           </div>
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(130px,1fr))",gap:7}}>
-            {[[brain.semantic.length,"Factos",AC.claude,"â—†"],[brain.sessions,"SessÃµes",AC.gemini,"â—ˆ"],[brain.patterns.length,"PadrÃµes",AC.grok,"â—‰"],[brain.semantic.length+brain.episodic.length+brain.patterns.length,"Total",AC.genspark,"â—Ž"]].map(([n,l,c,ic],idx)=>(
+            {[[brain.semantic.length,"Factos",AC.claude,"â—†"],[brain.sessions,"Sessões",AC.gemini,"◈"],[brain.patterns.length,"Padrões",AC.grok,"â—‰"],[brain.semantic.length+brain.episodic.length+brain.patterns.length,"Total",AC.genspark,"â—Ž"]].map(([n,l,c,ic],idx)=>(
               <div key={`memory-stat-${idx}-${l}`} style={{background:T.s1,border:`1px solid ${T.b1}`,borderRadius:13,padding:"11px 7px",textAlign:"center"}}>
                 <div style={{fontSize:10,color:c,marginBottom:2}}>{ic}</div>
                 <div style={{fontSize:21,fontWeight:800,color:T.tx,lineHeight:1}}>{n}</div>
@@ -2113,41 +2113,41 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
               </div>
             ))}
           </div>
-          {[{title:"SemÃ¢ntica",sub:"Conhecimento base",color:AC.claude,icon:"â—†",items:brain.semantic.slice().reverse().map(x=>`[${x.tipo}] ${x.descricao}`)},{title:"EpisÃ³dica",sub:"HistÃ³rico contÃ­nuo",color:AC.gemini,icon:"â—ˆ",items:brain.episodic.slice().reverse()},{title:"PadrÃµes",sub:"RaciocÃ­nio dedutivo",color:AC.grok,icon:"â—‰",items:brain.patterns}].map((sec,idx)=>(
+          {[{title:"Semântica",sub:"Conhecimento base",color:AC.claude,icon:"â—†",items:brain.semantic.slice().reverse().map(x=>`[${x.tipo}] ${x.descricao}`)},{title:"Episódica",sub:"Histórico contínuo",color:AC.gemini,icon:"◈",items:brain.episodic.slice().reverse()},{title:"Padrões",sub:"Raciocínio dedutivo",color:AC.grok,icon:"â—‰",items:brain.patterns}].map((sec,idx)=>(
             <div key={`memory-section-${idx}-${sec.title}`} style={{background:T.s1,border:`1px solid ${T.b1}`,borderRadius:13,overflow:"hidden"}}>
               <div style={{padding:"9px 13px",borderBottom:sec.items.length>0?`1px solid ${T.b2}`:"none",display:"flex",alignItems:"center",gap:6}}>
                 <span style={{color:sec.color,fontSize:12}}>{sec.icon}</span>
                 <div><div style={{fontSize:11,fontWeight:600,color:T.tx}}>{sec.title}</div><div style={{fontSize:9,color:T.ts}}>{sec.sub}</div></div>
                 <span style={{marginLeft:"auto",fontSize:9,color:T.tf,background:T.s2,border:`1px solid ${T.b1}`,borderRadius:20,padding:"1px 6px"}}>{sec.items.length}</span>
               </div>
-              {sec.items.length===0?<div style={{padding:"11px 13px",fontSize:10,color:T.tf,fontStyle:"italic"}}>{"MemÃ³ria vazia"}</div>:sec.items.map((it,i)=><div key={`memory-item-${i}-${String(it).slice(0,10)}`} style={{padding:"6px 13px",fontSize:10,color:T.ts,borderBottom:i<sec.items.length-1?`1px solid ${T.b2}`:"none",lineHeight:1.5}}>â€¢ {it}</div>)}
+              {sec.items.length===0?<div style={{padding:"11px 13px",fontSize:10,color:T.tf,fontStyle:"italic"}}>{"Memória vazia"}</div>:sec.items.map((it,i)=><div key={`memory-item-${i}-${String(it).slice(0,10)}`} style={{padding:"6px 13px",fontSize:10,color:T.ts,borderBottom:i<sec.items.length-1?`1px solid ${T.b2}`:"none",lineHeight:1.5}}>• {it}</div>)}
             </div>
           ))}
-          {brain.lastReflect&&<div style={{fontSize:8,color:T.tf,textAlign:"center"}}>{"Ãšltima reflexÃ£o:"} {new Date(brain.lastReflect).toLocaleString("pt-PT")}</div>}
+          {brain.lastReflect&&<div style={{fontSize:8,color:T.tf,textAlign:"center"}}>{"Última reflexão:"} {new Date(brain.lastReflect).toLocaleString("pt-PT")}</div>}
         </div>
       )}
 
-      {/* â”€â”€ DEFINIÃ‡Ã•ES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      {/* â”€â”€ DEFINIÇÕES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       {page==="settings" && (
         <div style={{flex:1,overflowY:"auto",padding:"18px 16px 24px",maxWidth:880,width:"100%",margin:"0 auto",boxSizing:"border-box"}}>
           <div style={{display:"flex",alignItems:"flex-end",justifyContent:"space-between",gap:12,marginBottom:16,flexWrap:"wrap"}}>
             <div>
-              <h2 style={{margin:0,fontSize:20,fontWeight:900,color:T.tx,letterSpacing:0.2}}>{"DefiniÃ§Ãµes Globais"}</h2>
-              <p style={{margin:"6px 0 0",fontSize:12,color:T.ts,lineHeight:1.5}}>CÃ³rtex v12 com {MODELS.length} lobos oficiais, memÃ³ria local e proxy sem servidor.</p>
+              <h2 style={{margin:0,fontSize:20,fontWeight:900,color:T.tx,letterSpacing:0.2}}>{"Definições Globais"}</h2>
+              <p style={{margin:"6px 0 0",fontSize:12,color:T.ts,lineHeight:1.5}}>Córtex v12 com {MODELS.length} lobos oficiais, memória local e proxy sem servidor.</p>
             </div>
             <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
-              <span style={{border:`1px solid ${AC.claude}44`,background:`${AC.claude}12`,color:AC.claude,borderRadius:999,padding:"5px 9px",fontSize:11,fontWeight:800}}>CompilaÃ§Ã£o {BUILD}</span>
+              <span style={{border:`1px solid ${AC.claude}44`,background:`${AC.claude}12`,color:AC.claude,borderRadius:999,padding:"5px 9px",fontSize:11,fontWeight:800}}>Compilação {BUILD}</span>
               <span style={{border:`1px solid ${T.b1}`,background:T.s2,color:T.ts,borderRadius:999,padding:"5px 9px",fontSize:11}}>{Object.values(keys).filter(k=>k?.trim().length>10).length}/{Object.keys(keys).length} chaves</span>
             </div>
           </div>
 
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(190px,1fr))",gap:10,marginBottom:14}}>
             {[
-              {icon:THEMES[theme].emoji,title:"PersonalizaÃ§Ã£o",sub:`${THEMES[theme].name} Â· ${Object.keys(THEMES).length} temas disponÃ­veis`,action:"Alterar Tema",color:AC.claude,onClick:()=>setShowTP(true)},
-              {icon:"ðŸ”‘",title:"Chaves API",sub:`${Object.values(keys).filter(k=>k?.trim().length>10).length} de ${Object.keys(keys).length} chaves configuradas`,action:"Gerir",color:AC.perp,onClick:()=>setPage("keys")},
-              {icon:"â—ˆ",title:"Lobos",sub:`${MODELS.filter(m=>modelsOn[m.id]!==false).length}/${MODELS.length} lobos activos`,action:"Gerir",color:AC.gemini,onClick:()=>setShowModels(true)},
-              {icon:"ðŸ§ ",title:"Banco de MemÃ³ria",sub:`${brain.semantic.length} factos Â· ${brain.sessions} conversas`,action:"Abrir",color:AC.grok,onClick:()=>setPage("memory")},
-              {icon:"ðŸ”¬",title:"Modo Forense",sub:`${msgs.length} mensagens Â· fase ${phase || "parado"}`,action:"Abrir",color:AC.deepseek,onClick:()=>setShowForensePanel(true)},
+              {icon:THEMES[theme].emoji,title:"Personalização",sub:`${THEMES[theme].name} · ${Object.keys(THEMES).length} temas disponíveis`,action:"Alterar Tema",color:AC.claude,onClick:()=>setShowTP(true)},
+              {icon:"🔑",title:"Chaves API",sub:`${Object.values(keys).filter(k=>k?.trim().length>10).length} de ${Object.keys(keys).length} chaves configuradas`,action:"Gerir",color:AC.perp,onClick:()=>setPage("keys")},
+              {icon:"◈",title:"Lobos",sub:`${MODELS.filter(m=>modelsOn[m.id]!==false).length}/${MODELS.length} lobos activos`,action:"Gerir",color:AC.gemini,onClick:()=>setShowModels(true)},
+              {icon:"🧠",title:"Banco de Memória",sub:`${brain.semantic.length} factos · ${brain.sessions} conversas`,action:"Abrir",color:AC.grok,onClick:()=>setPage("memory")},
+              {icon:"🔬",title:"Modo Forense",sub:`${msgs.length} mensagens · fase ${phase || "parado"}`,action:"Abrir",color:AC.deepseek,onClick:()=>setShowForensePanel(true)},
             ].map((card,idx)=>(
               <button key={`settings-card-${idx}-${card.title}`} type="button" onClick={card.onClick} style={{background:T.s1,border:`1px solid ${T.b1}`,borderRadius:14,padding:14,textAlign:"left",cursor:"pointer",fontFamily:"inherit",minHeight:118,display:"flex",flexDirection:"column",justifyContent:"space-between",boxShadow:`0 8px 24px ${T.b2}55`,transition:"border-color 0.2s, transform 0.2s"}}>
                 <div style={{display:"flex",alignItems:"center",gap:9}}>
@@ -2157,16 +2157,16 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
                     <div style={{fontSize:10,color:T.ts,marginTop:3,lineHeight:1.4}}>{card.sub}</div>
                   </div>
                 </div>
-                <div style={{fontSize:11,fontWeight:800,color:card.color,marginTop:12}}>{card.action} â†’</div>
+                <div style={{fontSize:11,fontWeight:800,color:card.color,marginTop:12}}>{card.action} →</div>
               </button>
             ))}
           </div>
 
           <div style={{background:T.s1,border:`1px solid ${T.b1}`,borderRadius:16,padding:14,boxShadow:`0 8px 24px ${T.b2}55`,marginBottom:14,display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,flexWrap:"wrap"}}>
             <div style={{minWidth:220,flex:1}}>
-              <div style={{fontSize:14,fontWeight:900,color:T.tx}}>{"MemÃ³ria de sessÃµes anteriores"}</div>
+              <div style={{fontSize:14,fontWeight:900,color:T.tx}}>{"Memória de sessões anteriores"}</div>
               <div style={{fontSize:11,color:T.ts,lineHeight:1.5,marginTop:4}}>
-                {"O CÃ³rtex guarda um resumo das Ãºltimas conversas para oferecer continuidade."}
+                {"O Córtex guarda um resumo das últimas conversas para oferecer continuidade."}
               </div>
             </div>
             <button
@@ -2175,11 +2175,11 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
                 clearMemory();
                 setContextoSessaoAnterior(null);
                 setMemoryBannerDismissed(true);
-                toast("MemÃ³ria apagada.", "sucesso");
+                toast("Memória apagada.", "sucesso");
               }}
               style={btn(T,"#ef4444")}
             >
-              {"Apagar memÃ³ria"}
+              {"Apagar memória"}
             </button>
           </div>
 
@@ -2187,7 +2187,7 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:10,marginBottom:10}}>
               <div>
                 <div style={{fontSize:14,fontWeight:900,color:T.tx}}>{"Arquitectura"}</div>
-                <div style={{fontSize:10,color:T.ts,marginTop:3}}>Router inteligente escolhe sÃ³ os lobos necessÃ¡rios; nunca corre uma lista antiga de 11 ao mesmo tempo.</div>
+                <div style={{fontSize:10,color:T.ts,marginTop:3}}>Router inteligente escolhe só os lobos necessários; nunca corre uma lista antiga de 11 ao mesmo tempo.</div>
               </div>
               <button type="button" onClick={()=>setShowModels(true)} style={btn(T,AC.gemini)}>Configurar lobos</button>
             </div>
@@ -2244,7 +2244,7 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
               borderRadius: '8px', padding: '0.4rem 0.8rem',
               cursor: 'pointer', fontSize: '0.85rem', zIndex: 999
             }}
-          >ðŸ§ª AvaliaÃ§Ãµes</button>
+          >🧪 Avaliações</button>
           {showEvals && <EvalsPanel onClose={() => setShowEvals(false)} />}
         </>
       )}

@@ -12,6 +12,7 @@ const INJECTION_PATTERNS = [
   /\[SYSTEM\]|\[INST\]|\[\/INST\]|<s>|<\/s>/i,
 ];
 const MAX_INPUT_LENGTH = 4000;
+const MAX_MESSAGE_LENGTH = 60000; // Permite contextos longos agregados pelo sistema (ex: debate, veredicto do Rei)
 
 // ← FIX 2: normalizar unicode antes de testar
 function normalizeText(str) {
@@ -56,7 +57,7 @@ function sanitize(req, res, next) {
 
       // ← FIX 4: sanitizar também tool_calls nested
       const content = normalizeText(m.content || "");
-      if (content.length > MAX_INPUT_LENGTH)
+      if (content.length > MAX_MESSAGE_LENGTH)
         return res.status(400).json({ error: "Mensagem demasiado longa." });
       if (!checkPatterns(content, res)) return;
 

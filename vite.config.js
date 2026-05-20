@@ -31,7 +31,6 @@ export default defineConfig({
 
   server: {
     host: true, // Permite acesso pela rede local
-    headers: { 'Content-Type': 'text/html; charset=utf-8' },
     hmr: {
       // Deixa o cliente HMR inferir o host/porto automaticamente
       clientPort: process.env.PORT ? parseInt(process.env.PORT) : undefined,
