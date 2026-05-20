@@ -32,6 +32,7 @@ import {
   getLatestMemories,
 } from "./utils/sessionMemory.js";
 import { getMemoryStats, deleteMemory } from "./lib/memory.js";
+import { obterBadgeConfianca, obterFontesWebMensagem } from "./utils/confidence.js";
 
 const MV="cortex-v12";
 const MAX_BUF=8;
@@ -46,27 +47,27 @@ const APP_VERSION = `v12.${BUILD}`;
 
 const THEMES={
   cortex:    {name:"Córtex",     emoji:"🧠",bg:"#08080c",s1:"#0f0f16",s2:"#14141e",s3:"#1a1a26",b1:"#222232",b2:"#161622",tx:"#e8e8f8",ts:"#6868a0",tf:"#2a2a44"},
-  grok:      {name:"Grok",       emoji:"âš¡",bg:"#060608",s1:"#0d0d10",s2:"#121215",s3:"#181820",b1:"#202025",b2:"#141418",tx:"#f0f0f8",ts:"#505060",tf:"#1e1e28"},
+  grok:      {name:"Grok",       emoji:"⚡",bg:"#060608",s1:"#0d0d10",s2:"#121215",s3:"#181820",b1:"#202025",b2:"#141418",tx:"#f0f0f8",ts:"#505060",tf:"#1e1e28"},
   neural:    {name:"Neural",     emoji:"🔬",bg:"#04060a",s1:"#080c14",s2:"#0c1020",s3:"#101828",b1:"#162030",b2:"#0e1828",tx:"#d8ecff",ts:"#3a6090",tf:"#0c1828"},
-  obsidian:  {name:"Obsidian",   emoji:"ðŸª¨",bg:"#0a0a0a",s1:"#111111",s2:"#161616",s3:"#1e1e1e",b1:"#252525",b2:"#1c1c1c",tx:"#eeeeee",ts:"#666666",tf:"#2a2a2a"},
-  midnight:  {name:"Midnight",   emoji:"ðŸŒ™",bg:"#03030f",s1:"#07071a",s2:"#0a0a22",s3:"#0e0e2e",b1:"#14143a",b2:"#0d0d2a",tx:"#d0d0ff",ts:"#5050a0",tf:"#14143a"},
-  gemini:    {name:"Gemini",     emoji:"ðŸŒ€",bg:"#070a0f",s1:"#0c1018",s2:"#101520",s3:"#141a28",b1:"#1c2638",b2:"#141e30",tx:"#d8e4ff",ts:"#4a6898",tf:"#182040"},
-  perplexity:{name:"Perplexity", emoji:"ðŸ”·",bg:"#090a0e",s1:"#10111a",s2:"#14151e",s3:"#181924",b1:"#202230",b2:"#181928",tx:"#e4e8ff",ts:"#5060a0",tf:"#202040"},
-  crimson:   {name:"Crimson",    emoji:"ðŸ”´",bg:"#0e0608",s1:"#180a0c",s2:"#200e10",s3:"#261216",b1:"#2e1418",b2:"#200e10",tx:"#f0d0d4",ts:"#905060",tf:"#2e1418"},
-  amber:     {name:"Amber",      emoji:"ðŸŸ¡",bg:"#0c0800",s1:"#180f00",s2:"#201500",s3:"#281c00",b1:"#302000",b2:"#201500",tx:"#fff0c0",ts:"#a07830",tf:"#302000"},
-  forest:    {name:"Forest",     emoji:"ðŸŒ¿",bg:"#060c08",s1:"#0a120c",s2:"#0e1810",s3:"#121e14",b1:"#1a2e1c",b2:"#121e14",tx:"#d0e8d4",ts:"#5a9060",tf:"#182818"},
-  violet:    {name:"Violet",     emoji:"ðŸŸ£",bg:"#0c0712",s1:"#120a1c",s2:"#180e26",s3:"#1e1230",b1:"#261838",b2:"#160e22",tx:"#e0d0ff",ts:"#7060a0",tf:"#1e1430"},
-  teal:      {name:"Teal",       emoji:"ðŸ©µ",bg:"#03100e",s1:"#051816",s2:"#07201e",s3:"#0a2826",b1:"#0e3030",b2:"#0a2828",tx:"#c0f0f0",ts:"#309898",tf:"#0e3030"},
-  light:     {name:"Claro",      emoji:"â˜€ï¸",bg:"#f4f3f0",s1:"#ffffff",s2:"#eeede8",s3:"#e6e4de",b1:"#d0cdc6",b2:"#dbd8d0",tx:"#181816",ts:"#666056",tf:"#aaa898"},
-  paper:     {name:"Paper",      emoji:"ðŸ“„",bg:"#f8f6f0",s1:"#fffef8",s2:"#f0ece0",s3:"#e8e0d0",b1:"#d8d0c0",b2:"#e8e0d0",tx:"#2a2416",ts:"#7a7060",tf:"#c0b898"},
-  // â”€â”€ Novos temas v11 â”€â”€
-  anthropic: {name:"Anthropic",  emoji:"ðŸŸ ",bg:"#0d0b08",s1:"#141210",s2:"#1c1916",s3:"#231f1b",b1:"#302820",b2:"#241e18",tx:"#faf9f5",ts:"#b0aea5",tf:"#4a3828"},
-  ocean:     {name:"Ocean",      emoji:"ðŸŒŠ",bg:"#020d14",s1:"#041420",s2:"#06192a",s3:"#082034",b1:"#0c2a42",b2:"#071a2c",tx:"#c8eeff",ts:"#3a7a9c",tf:"#0c2030"},
-  arctic:    {name:"Arctic",     emoji:"ðŸ§Š",bg:"#040810",s1:"#070c18",s2:"#0a1020",s3:"#0d1428",b1:"#121c38",b2:"#0a1020",tx:"#ddeeff",ts:"#5580aa",tf:"#182038"},
-  sunset:    {name:"Sunset",     emoji:"ðŸŒ…",bg:"#0e0608",s1:"#180c08",s2:"#22100c",s3:"#2c1410",b1:"#341810",b2:"#240e0a",tx:"#ffeedd",ts:"#cc6644",tf:"#4a1e14"},
-  matrix:    {name:"Matrix",     emoji:"ðŸ’š",bg:"#000d00",s1:"#011201",s2:"#011802",s3:"#021e02",b1:"#032a03",b2:"#021802",tx:"#00ff41",ts:"#007a1e",tf:"#003010"},
-  sakura:    {name:"Sakura",     emoji:"ðŸŒ¸",bg:"#0e050a",s1:"#160810",s2:"#1e0c16",s3:"#26101e",b1:"#2e1428",b2:"#200c18",tx:"#ffd0e8",ts:"#c06090",tf:"#401030"},
-  slate:     {name:"Slate",      emoji:"ðŸªž",bg:"#0c0e10",s1:"#111418",s2:"#161a1e",s3:"#1c2028",b1:"#222830",b2:"#181c22",tx:"#d8dde8",ts:"#6070a0",tf:"#242a38"},
+  obsidian:  {name:"Obsidian",   emoji:"🪨",bg:"#0a0a0a",s1:"#111111",s2:"#161616",s3:"#1e1e1e",b1:"#252525",b2:"#1c1c1c",tx:"#eeeeee",ts:"#666666",tf:"#2a2a2a"},
+  midnight:  {name:"Midnight",   emoji:"🌙",bg:"#03030f",s1:"#07071a",s2:"#0a0a22",s3:"#0e0e2e",b1:"#14143a",b2:"#0d0d2a",tx:"#d0d0ff",ts:"#5050a0",tf:"#14143a"},
+  gemini:    {name:"Gemini",     emoji:"🌀",bg:"#070a0f",s1:"#0c1018",s2:"#101520",s3:"#141a28",b1:"#1c2638",b2:"#141e30",tx:"#d8e4ff",ts:"#4a6898",tf:"#182040"},
+  perplexity:{name:"Perplexity", emoji:"🔷",bg:"#090a0e",s1:"#10111a",s2:"#14151e",s3:"#181924",b1:"#202230",b2:"#181928",tx:"#e4e8ff",ts:"#5060a0",tf:"#202040"},
+  crimson:   {name:"Crimson",    emoji:"🔴",bg:"#0e0608",s1:"#180a0c",s2:"#200e10",s3:"#261216",b1:"#2e1418",b2:"#200e10",tx:"#f0d0d4",ts:"#905060",tf:"#2e1418"},
+  amber:     {name:"Amber",      emoji:"🟡",bg:"#0c0800",s1:"#180f00",s2:"#201500",s3:"#281c00",b1:"#302000",b2:"#201500",tx:"#fff0c0",ts:"#a07830",tf:"#302000"},
+  forest:    {name:"Forest",     emoji:"🌿",bg:"#060c08",s1:"#0a120c",s2:"#0e1810",s3:"#121e14",b1:"#1a2e1c",b2:"#121e14",tx:"#d0e8d4",ts:"#5a9060",tf:"#182818"},
+  violet:    {name:"Violet",     emoji:"🟣",bg:"#0c0712",s1:"#120a1c",s2:"#180e26",s3:"#1e1230",b1:"#261838",b2:"#160e22",tx:"#e0d0ff",ts:"#7060a0",tf:"#1e1430"},
+  teal:      {name:"Teal",       emoji:"🩵",bg:"#03100e",s1:"#051816",s2:"#07201e",s3:"#0a2826",b1:"#0e3030",b2:"#0a2828",tx:"#c0f0f0",ts:"#309898",tf:"#0e3030"},
+  light:     {name:"Claro",      emoji:"☀️",bg:"#f4f3f0",s1:"#ffffff",s2:"#eeede8",s3:"#e6e4de",b1:"#d0cdc6",b2:"#dbd8d0",tx:"#181816",ts:"#666056",tf:"#aaa898"},
+  paper:     {name:"Paper",      emoji:"📄",bg:"#f8f6f0",s1:"#fffef8",s2:"#f0ece0",s3:"#e8e0d0",b1:"#d8d0c0",b2:"#e8e0d0",tx:"#2a2416",ts:"#7a7060",tf:"#c0b898"},
+  // ── Novos temas v11 ──
+  anthropic: {name:"Anthropic",  emoji:"🟠",bg:"#0d0b08",s1:"#141210",s2:"#1c1916",s3:"#231f1b",b1:"#302820",b2:"#241e18",tx:"#faf9f5",ts:"#b0aea5",tf:"#4a3828"},
+  ocean:     {name:"Ocean",      emoji:"🌊",bg:"#020d14",s1:"#041420",s2:"#06192a",s3:"#082034",b1:"#0c2a42",b2:"#071a2c",tx:"#c8eeff",ts:"#3a7a9c",tf:"#0c2030"},
+  arctic:    {name:"Arctic",     emoji:"🧊",bg:"#040810",s1:"#070c18",s2:"#0a1020",s3:"#0d1428",b1:"#121c38",b2:"#0a1020",tx:"#ddeeff",ts:"#5580aa",tf:"#182038"},
+  sunset:    {name:"Sunset",     emoji:"🌇",bg:"#0e0608",s1:"#180c08",s2:"#22100c",s3:"#2c1410",b1:"#341810",b2:"#240e0a",tx:"#ffeedd",ts:"#cc6644",tf:"#4a1e14"},
+  matrix:    {name:"Matrix",     emoji:"💚",bg:"#000d00",s1:"#011201",s2:"#011802",s3:"#021e02",b1:"#032a03",b2:"#021802",tx:"#00ff41",ts:"#007a1e",tf:"#003010"},
+  sakura:    {name:"Sakura",     emoji:"🌸",bg:"#0e050a",s1:"#160810",s2:"#1e0c16",s3:"#26101e",b1:"#2e1428",b2:"#200c18",tx:"#ffd0e8",ts:"#c06090",tf:"#401030"},
+  slate:     {name:"Slate",      emoji:"🪨",bg:"#0c0e10",s1:"#111418",s2:"#161a1e",s3:"#1c2028",b1:"#222830",b2:"#181c22",tx:"#d8dde8",ts:"#6070a0",tf:"#242a38"},
 };
 
 const AC={
@@ -118,28 +119,7 @@ const defaultKeys = {
   manus:""
 };
 
-export function obterBadgeConfianca(confiancaFinal) {
-  const valor = Number(confiancaFinal);
-  if (!Number.isFinite(valor) || valor >= 70) return null;
-  if (valor >= 40) return { texto: "Confiança média", cor: "#f59e0b", icone: "⚠️" };
-  return { texto: "Baixa confiança", cor: "#ef4444", icone: "🔴" };
-}
 
-export function obterFontesWebMensagem(mensagem) {
-  const fontes = mensagem?.webSources || mensagem?.structured?.webSources || mensagem?.king?.webSources || [];
-  if (!Array.isArray(fontes)) return [];
-  return fontes
-    .map((fonte) => {
-      const content = String(fonte?.content || "").trim();
-      return {
-        title: String(fonte?.title || "").trim(),
-        url: String(fonte?.url || "").trim(),
-        ...(content ? { content } : {}),
-      };
-    })
-    .filter((fonte) => fonte.title && fonte.url)
-    .slice(0, 3);
-}
 
 function ConfidenceBadge({ confiancaFinal }) {
   const badge = obterBadgeConfianca(confiancaFinal);
@@ -631,7 +611,7 @@ function KeyRow({ api, T, value, onChange }) {
         <button onClick={() => setShow(v => !v)}
           style={{ background: T.s1, border: `1px solid ${T.b1}`, borderRadius: 8, width: 32, height: 32,
             cursor: "pointer", fontSize: 11, color: T.ts, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          {show ? "ðŸ™ˆ" : "ðŸ‘"}
+          {show ? "🙉" : "👁️"}
         </button>
       </div>
       <div style={{ display: "flex", gap: 5, marginTop: 5 }}>
@@ -1118,7 +1098,7 @@ async function send(query, options = {}) {
   function exportConv(){
     const lines=[`# Conversa — ${"Bem-vindo ao Córtex"}`,`> ${new Date().toLocaleString()}`,""];
     msgs.forEach(m=>{
-      if(m.role==="user")lines.push(`## ðŸ§‘ Tu`,m.content,"");
+      if(m.role==="user")lines.push(`## 🧑 Tu`,m.content,"");
       else if(m.systemNote)lines.push(`> ${m.content}`,"");
       else{lines.push(`## 🧠 Córtex`,m.content,"");if(m.councilDecision)lines.push(`> ⚖ ${m.councilDecision}`,"");}
     });
@@ -1327,7 +1307,7 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
         <Modal T={T} title={"Exportar Memória"} onClose={()=>setShowExport(false)}>
           <p style={{fontSize:11,color:T.ts,marginBottom:7}}>{"JSON do teu cérebro:"}</p>
           <textarea readOnly value={JSON.stringify(normBrain(brain),null,2)} onClick={e=>e.target.select()} style={{width:"100%",height:180,background:T.s2,border:`1px solid ${T.b1}`,borderRadius:8,padding:9,color:T.tx,fontSize:10,fontFamily:"monospace",resize:"vertical",outline:"none",boxSizing:"border-box"}}/>
-          <button onClick={()=>navigator.clipboard?.writeText(JSON.stringify(normBrain(brain),null,2)).then(()=>toast("Copiado","success"))} style={{...btn(T,AC.claude),marginTop:7,width:"100%"}}>{"ðŸ“‹ Copiar"}</button>
+          <button onClick={()=>navigator.clipboard?.writeText(JSON.stringify(normBrain(brain),null,2)).then(()=>toast("Copiado","success"))} style={{...btn(T,AC.claude),marginTop:7,width:"100%"}}>{"📋 Copiar"}</button>
         </Modal>
       )}
 
@@ -1335,7 +1315,7 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
         <Modal T={T} title={"Importar Memória"} onClose={()=>{setShowImport(false);setImportErr("");setImportTxt("");}}>
           <textarea value={importTxt} onChange={e=>setImportTxt(e.target.value)} placeholder={'{"episodic":[],"semantic":[],...}'} style={{width:"100%",height:180,background:T.s2,border:`1px solid ${T.b1}`,borderRadius:8,padding:9,color:T.tx,fontSize:10,fontFamily:"monospace",resize:"vertical",outline:"none",boxSizing:"border-box"}}/>
           {importErr && <div style={{color:"#fca5a5",fontSize:11,marginTop:4}}>{importErr}</div>}
-          <button onClick={doImport} style={{...btn(T,AC.claude),marginTop:7,width:"100%"}}>{"âœ“ Importar e substituir"}</button>
+          <button onClick={doImport} style={{...btn(T,AC.claude),marginTop:7,width:"100%"}}>{"✓ Importar e substituir"}</button>
         </Modal>
       )}
 
@@ -1648,11 +1628,11 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
       <span><b style={{color:AC.gemini}}>{brain.sessions}</b> sess</span>
       <span><b style={{color:AC.grok}}>{buf.length}/{MAX_BUF}</b> buf</span>
       <span><b style={{color:T.ts}}>{msgs.filter(m=>m.role==="user").length}</b> msg</span>
-      <span title="Respostas em cache"><b style={{color:AC.perp}}>{cacheSize}</b>âš¡</span>
+      <span title="Respostas em cache"><b style={{color:AC.perp}}>{cacheSize}</b>⚡</span>
     </div>
   </div>
 )}
-{/* â”€â”€ FAB MÃ“VEL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+{/* -------------------------------- */}
 {isMobile && (
   <>
     <div
@@ -1687,7 +1667,7 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
       }}
     >
       <div style={{display:"flex",alignItems:"center",justifyContent:"center",position:"relative",padding:"4px 0 10px"}}>
-        <div style={{width:38,height:4,borderRadius:999,background:T.b1}} />
+        <div style={{width:38,height:4,borderRadius:999,background:T.b1} } />
         <button
           onClick={()=>setFabOpen(false)}
           aria-label={"Fechar"}
@@ -1708,7 +1688,7 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
             justifyContent:"center"
           }}
         >
-          âœ•
+          ✖
         </button>
       </div>
 
@@ -1749,14 +1729,14 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
             },
             {
               key:"blueprints",
-              icon:"ðŸ—ºï¸",
+              icon:"🗺️",
               label:"Mapas",
               active:showBlueprintsPanel,
               onClick:()=>{setShowBlueprintsPanel(true);setPagina("chat");setPage("chat");setFabOpen(false);}
             },
             {
               key:"code",
-              icon:"ðŸ’»",
+              icon:"💻",
               label:"Código",
               active:modoCode,
               onClick:()=>{setModoCode((m) => !m);setFabOpen(false);}
@@ -1815,7 +1795,7 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
         transition:"transform 300ms cubic-bezier(0.4,0,0.2,1), background 300ms cubic-bezier(0.4,0,0.2,1), box-shadow 300ms cubic-bezier(0.4,0,0.2,1), color 300ms cubic-bezier(0.4,0,0.2,1), border-color 300ms cubic-bezier(0.4,0,0.2,1)"
       }}
     >
-      âš™
+      ⚙
     </button>
   </>
 )}
@@ -1917,9 +1897,9 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
                 checked={modoDebate}
                 onChange={e => setModoDebate(e.target.checked)}
               />
-              ðŸº Modo Debate
+              🐺 Modo Debate
               {modoDebate &&
-                <span style={{ color:'var(--warning)' }}>â± ~2Ã— mais lento</span>
+                <span style={{ color:'var(--warning)' }}>⏳ ~2x mais lento</span>
               }
             </label>
             {(modoDebate || aStreaming) && (
@@ -1974,11 +1954,11 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
             <div style={{display:"flex",gap:8,maxWidth:820,margin:"0 auto",alignItems:"flex-end"}}>
               {/* caixa de texto */}
               <div style={{flex:1,display:"flex",background:T.s2,border:`1px solid ${T.b1}`,borderRadius:16,padding:"8px 10px",alignItems:"flex-end",boxShadow:`0 2px 14px ${T.b2}66`,transition:"border-color 0.2s",gap:8}}>
-  <button type="button" onClick={()=>setShowFileUpload(p=>!p)} title="Anexar ficheiro" style={{background:ficheiroAnexado?`${AC.claude}18`:"transparent",border:`1px solid ${ficheiroAnexado?AC.claude+"55":T.b1}`,borderRadius:10,width:38,height:52,cursor:"pointer",fontSize:17,color:ficheiroAnexado?AC.claude:T.ts,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>ðŸ“Ž</button>
+  <button type="button" onClick={()=>setShowFileUpload(p=>!p)} title="Anexar ficheiro" style={{background:ficheiroAnexado?`${AC.claude}18`:"transparent",border:`1px solid ${ficheiroAnexado?AC.claude+"55":T.b1}`,borderRadius:10,width:38,height:52,cursor:"pointer",fontSize:17,color:ficheiroAnexado?AC.claude:T.ts,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>📎</button>
   {ficheiroAnexado && (
     <div style={{maxWidth:150,minHeight:52,display:"flex",alignItems:"center",gap:6,border:`1px solid ${AC.claude}33`,background:`${AC.claude}10`,borderRadius:10,padding:"6px 8px",color:AC.claude,fontSize:10,flexShrink:0}}>
-      <span style={{overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}} title={ficheiroAnexado.nome}>{ficheiroAnexado.nome}</span>
-      <button type="button" onClick={removerFicheiroAnexado} title="Remover ficheiro" style={{background:"transparent",border:"none",color:T.ts,cursor:"pointer",fontSize:12,padding:0,lineHeight:1}}>âœ•</button>
+      <span style={{overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"} } title={ficheiroAnexado.nome}>{ficheiroAnexado.nome}</span>
+      <button type="button" onClick={removerFicheiroAnexado} title="Remover ficheiro" style={{background:"transparent",border:"none",color:T.ts,cursor:"pointer",fontSize:12,padding:0,lineHeight:1}}>✖</button>
     </div>
   )}
   <div style={{position:"relative",flex:1,minWidth:0}}>
@@ -2009,12 +1989,12 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
   </div>
   <div style={{display:"flex",gap:3,alignItems:"flex-end",flexShrink:0}}>
     {msgs.filter(m=>m.role==="user").length>0&&!phase&&
-      <button onClick={regenerate} style={{background:"transparent",border:"none",borderRadius:8,width:30,height:30,cursor:"pointer",fontSize:13,color:T.ts,display:"flex",alignItems:"center",justifyContent:"center",transition:"all 0.18s",opacity:0.75}} onMouseEnter={e=>{e.currentTarget.style.opacity="1";e.currentTarget.style.color=AC.claude;}} onMouseLeave={e=>{e.currentTarget.style.opacity="0.75";e.currentTarget.style.color=T.ts;}} title={"Regerar Resposta"}>â†º</button>}
+      <button onClick={regenerate} style={{background:"transparent",border:"none",borderRadius:8,width:30,height:30,cursor:"pointer",fontSize:13,color:T.ts,display:"flex",alignItems:"center",justifyContent:"center",transition:"all 0.18s",opacity:0.75}} onMouseEnter={e=>{e.currentTarget.style.opacity="1";e.currentTarget.style.color=AC.claude;}} onMouseLeave={e=>{e.currentTarget.style.opacity="0.75";e.currentTarget.style.color=T.ts;}} title={"Regerar Resposta"}>↻</button>}
     <button onClick={() => {
       ouvirMicrofone(setInput, (msg, type) => toast(msg, type));
-    }} style={{background:"transparent",border:"none",borderRadius:8,width:30,height:30,cursor:"pointer",fontSize:13,color:T.ts,display:"flex",alignItems:"center",justifyContent:"center",transition:"all 0.18s",opacity:0.7}} onMouseEnter={e=>e.currentTarget.style.opacity="1"} onMouseLeave={e=>e.currentTarget.style.opacity="0.7"} title={"Ditado por Voz"}>ðŸŽ™</button>
+    }} style={{background:"transparent",border:"none",borderRadius:8,width:30,height:30,cursor:"pointer",fontSize:13,color:T.ts,display:"flex",alignItems:"center",justifyContent:"center",transition:"all 0.18s",opacity:0.7}} onMouseEnter={e=>e.currentTarget.style.opacity="1"} onMouseLeave={e=>e.currentTarget.style.opacity="0.7"} title={"Ditado por Voz"}>🎙️</button>
         {msgs.length>0&&
-      <button onClick={exportConv} style={{background:"transparent",border:"none",borderRadius:8,width:30,height:30,cursor:"pointer",fontSize:13,color:T.ts,display:"flex",alignItems:"center",justifyContent:"center",transition:"all 0.18s",opacity:0.75}} onMouseEnter={e=>{e.currentTarget.style.opacity="1";e.currentTarget.style.color=AC.gemini;}} onMouseLeave={e=>{e.currentTarget.style.opacity="0.75";e.currentTarget.style.color=T.ts;}} title={"Exportar"}>â†“</button>}
+      <button onClick={exportConv} style={{background:"transparent",border:"none",borderRadius:8,width:30,height:30,cursor:"pointer",fontSize:13,color:T.ts,display:"flex",alignItems:"center",justifyContent:"center",transition:"all 0.18s",opacity:0.75}} onMouseEnter={e=>{e.currentTarget.style.opacity="1";e.currentTarget.style.color=AC.gemini;}} onMouseLeave={e=>{e.currentTarget.style.opacity="0.75";e.currentTarget.style.color=T.ts;}} title={"Exportar"}>↓</button>}
   </div>
 </div>
               {/* botão enviar / parar */}
@@ -2024,7 +2004,7 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
                   onClick={stopGeneration}
                   title="Parar geração"
                   style={{background:"rgba(239,68,68,0.18)",border:"1px solid rgba(239,68,68,0.44)",borderRadius:14,minWidth:72,height:44,cursor:"pointer",fontSize:12,fontWeight:800,color:"#fecaca",transition:"background 0.2s, box-shadow 0.2s, opacity 0.2s",display:"flex",alignItems:"center",justifyContent:"center",gap:6,boxShadow:"0 0 16px rgba(239,68,68,0.25)",flexShrink:0,fontFamily:"inherit"}}
-                >â–  Parar</button>
+                >■ Parar</button>
               ) : (
                 <button
                   onClick={()=>{send();ajustar(true);}}

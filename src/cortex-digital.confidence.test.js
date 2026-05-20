@@ -22,14 +22,14 @@ afterEach(() => {
 
 describe("confidence badges", () => {
   it("não mostra badge quando a confiança final é 70 ou superior", async () => {
-    const { obterBadgeConfianca } = await import("./cortex-digital.jsx");
+    const { obterBadgeConfianca } = await import("./utils/confidence.js");
 
     expect(obterBadgeConfianca(70)).toBeNull();
     expect(obterBadgeConfianca(95)).toBeNull();
   });
 
   it("mostra badge amarelo entre 40 e 69", async () => {
-    const { obterBadgeConfianca } = await import("./cortex-digital.jsx");
+    const { obterBadgeConfianca } = await import("./utils/confidence.js");
 
     expect(obterBadgeConfianca(40)).toMatchObject({
       texto: "Confiança média",
@@ -44,7 +44,7 @@ describe("confidence badges", () => {
   });
 
   it("mostra badge vermelho abaixo de 40", async () => {
-    const { obterBadgeConfianca } = await import("./cortex-digital.jsx");
+    const { obterBadgeConfianca } = await import("./utils/confidence.js");
 
     expect(obterBadgeConfianca(39)).toMatchObject({
       texto: "Baixa confiança",
@@ -56,7 +56,7 @@ describe("confidence badges", () => {
 
 describe("fontes web verificadas", () => {
   it("extrai fontes web da mensagem do Rei", async () => {
-    const { obterFontesWebMensagem } = await import("./cortex-digital.jsx");
+    const { obterFontesWebMensagem } = await import("./utils/confidence.js");
 
     expect(
       obterFontesWebMensagem({
@@ -66,7 +66,7 @@ describe("fontes web verificadas", () => {
   });
 
   it("ignora fontes sem título ou URL", async () => {
-    const { obterFontesWebMensagem } = await import("./cortex-digital.jsx");
+    const { obterFontesWebMensagem } = await import("./utils/confidence.js");
 
     expect(
       obterFontesWebMensagem({
