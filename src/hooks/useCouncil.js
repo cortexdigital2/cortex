@@ -234,6 +234,7 @@ export default function useCouncil(msgs, setMsgs) {
   const [consensusScore, setConsensusScore] = useState(0);
   const [debateResult, setDebateResult] = useState(null);
   const [frustrationLevel, setFrustrationLevel] = useState("none");
+  const [ragLatency, setRagLatency] = useState(null);
   const abortControllerRef = useRef(null);
   const controllersRef = useRef(new Map());
   const stopRequestedRef = useRef(false);
@@ -455,8 +456,10 @@ export default function useCouncil(msgs, setMsgs) {
     // RAG: Recuperação automática de contexto semântico do Supabase
     let ragContext = "";
     if (userId && userId !== "anon") {
+      const t0 = Date.now();
       try {
         const ragHits = await queryMemories(userId, q, 0.45, 3);
+        setRagLatency(Date.now() - t0);
         if (ragHits && ragHits.length > 0) {
           ragContext = ragHits
             .map((hit) => `- [Semelhança: ${Math.round(hit.similarity * 100)}%]: "${hit.content}"`)
@@ -785,6 +788,7 @@ export default function useCouncil(msgs, setMsgs) {
     generationTime,
     guardarMemoriaSessao,
     getLastSessionContext,
-    partialTexts: partialTextRef
+    partialTexts: partialTextRef,
+    ragLatency
   };
 }

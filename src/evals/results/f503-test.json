@@ -1,0 +1,31 @@
+{
+  "test_date": "2026-05-20T00:14:35.962Z",
+  "status": "success",
+  "stats_retrieved": {
+    "success": true,
+    "count": 2,
+    "provider": "Mock Embeddings",
+    "lastUpdated": "2026-05-19T23:44:35.954Z"
+  },
+  "latest_memories_retrieved": [
+    {
+      "id": 2,
+      "user_id": "alexandre_evals_user",
+      "content": "O protocolo OPC-UA é o padrão recomendado para comunicação industrial vertical.",
+      "metadata": {
+        "type": "semantic"
+      },
+      "created_at": "2026-05-19T23:44:35.954Z"
+    },
+    {
+      "id": 1,
+      "user_id": "alexandre_evals_user",
+      "content": "Sessão da conversa com ID 1: primeira resposta de automação.",
+      "metadata": {
+        "type": "session_summary"
+      },
+      "created_at": "2026-05-19T23:14:35.954Z"
+    }
+  ],
+  "delete_successful": true
+}

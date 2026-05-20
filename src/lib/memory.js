@@ -274,3 +274,15 @@ export async function getLastSessionSummary(userId) {
   }
 }
 
+export async function getLatestMemories(userId, limit = 5) {
+  if (!userId || userId === "anon") return [];
+  try {
+    const path = `memories?user_id=eq.${encodeURIComponent(userId)}&order=created_at.desc&limit=${limit}`;
+    const rows = await sbGet(path);
+    return rows || [];
+  } catch (e) {
+    console.warn("[memory] getLatestMemories falhou:", e.message);
+    return [];
+  }
+}
+

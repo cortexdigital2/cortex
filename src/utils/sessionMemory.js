@@ -1,4 +1,4 @@
-import { upsertMemory, getLastSessionSummary } from "../lib/memory.js";
+import { upsertMemory, getLastSessionSummary, getLatestMemories } from "../lib/memory.js";
 
 /**
  * Chave usada no localStorage.
@@ -170,4 +170,6 @@ export function clearMemory() {
     // localStorage indisponível — ignorar silenciosamente
   }
 }
+
+export { getLatestMemories };
 

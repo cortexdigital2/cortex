@@ -11,6 +11,8 @@ const geminiKey = (process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY
 
 const openai = openaiKey ? new OpenAI({ apiKey: openaiKey }) : null;
 
+export const activeProviderName = openai ? "OpenAI (text-embedding-3-small)" : (geminiKey ? "Gemini (text-embedding-004)" : "Mock (Offline)");
+
 // Helper to generate deterministic mock embeddings if everything else fails
 function getMockEmbedding(text) {
   const embedding = new Array(1536).fill(0);

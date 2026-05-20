@@ -29,7 +29,9 @@ import {
   injectSessionContext,
   shouldShowMemoryBanner,
   getLastSessionContextFromSupabase,
+  getLatestMemories,
 } from "./utils/sessionMemory.js";
+import { getMemoryStats, deleteMemory } from "./lib/memory.js";
 
 const MV="cortex-v12";
 const MAX_BUF=8;
@@ -604,7 +606,7 @@ export default function Cortex(){
   const { isMobile } = useMobile();
   const [brain,setBrain]     = useState(defaultBrain);
   const [msgs,setMsgs]       = useState([]);
-  const { send: runCouncil, invoke: runInvoke, lobeResults, cacheSize, phase, setPhase, stopGeneration, isGenerating, frustrationLevel, setFrustrationLevel, guardarMemoriaSessao, getLastSessionContext, partialTexts } = useCouncil(msgs, setMsgs);
+  const { send: runCouncil, invoke: runInvoke, lobeResults, cacheSize, phase, setPhase, stopGeneration, isGenerating, frustrationLevel, setFrustrationLevel, guardarMemoriaSessao, getLastSessionContext, partialTexts, ragLatency } = useCouncil(msgs, setMsgs);
   const [input,setInput]     = useState("");
   const [buf,setBuf]         = useState([]);  const [loaded,setLoaded]   = useState(false);
   const [page,setPage]       = useState("chat");
@@ -636,6 +638,9 @@ export default function Cortex(){
   const [showSidebar, setShowSidebar] = useState(false);
   const [showBlueprintsPanel, setShowBlueprintsPanel] = useState(false);
   const [showForensePanel, setShowForensePanel] = useState(false);
+  const [supabaseStats, setSupabaseStats] = useState(null);
+  const [recentMemories, setRecentMemories] = useState([]);
+  const [loadingForense, setLoadingForense] = useState(false);
   const [showCouncil, setShowCouncil] = useState(null);
   const [conversations, setConversations] = useState([]);
   const [currentConvId, setCurrentConvId] = useState(null);
@@ -755,6 +760,40 @@ export default function Cortex(){
       window.removeEventListener("beforeunload", guardarAntesDeSair);
     };
   },[guardarMemoriaSessao, userId]);
+
+  const carregarDadosForense = useCallback(async () => {
+    if (!userId || userId === "anon") return;
+    setLoadingForense(true);
+    try {
+      const stats = await getMemoryStats(userId);
+      setSupabaseStats(stats);
+      const recents = await getLatestMemories(userId, 5);
+      setRecentMemories(recents);
+    } catch (e) {
+      console.warn("[Forense] Falha ao carregar dados do Supabase:", e.message);
+    } finally {
+      setLoadingForense(false);
+    }
+  }, [userId]);
+
+  useEffect(() => {
+    if (showForensePanel) {
+      carregarDadosForense();
+    }
+  }, [showForensePanel, carregarDadosForense]);
+
+  const apagarMemoriaVectorial = async () => {
+    if (!window.confirm("Tens a certeza que desejas apagar definitivamente todas as tuas memórias vectoriais do Supabase? Esta ação não pode ser desfeita.")) {
+      return;
+    }
+    try {
+      await deleteMemory(userId);
+      toast("Todas as memórias foram removidas do Supabase.", "sucesso");
+      carregarDadosForense();
+    } catch (e) {
+      toast(`Falha ao apagar memórias: ${e.message}`, "erro");
+    }
+  };
 
   // Bloqueio automÃ¡tico das chaves ao navegar para outra pÃ¡gina
   useEffect(()=>{if(page!=="keys"&&!DEV_MODE)setDevUnlocked(false);},[page]);
@@ -1401,22 +1440,93 @@ function normalizeCouncilPayload(raw, fallbackText = "") {
     titulo="Modo Forense"
     largura="min(520px, 94vw)"
   >
-    <div style={{display:"flex",flexDirection:"column",gap:12}}>
-      <AlertaBanner tipo="info" mensagem="DiagnÃ³stico local da sessÃ£o actual do CÃ³rtex." />
-      {[
-        ["Mensagens", msgs.length],
-        ["Conversas guardadas", conversations.length],
-        ["Factos na memÃ³ria", brain.semantic.length],
-        ["SessÃµes memorizadas", brain.sessions],
-        ["Lobos activos", MODELS.filter(m=>modelsOn[m.id]!==false).length],
-        ["Fase actual", phase || "parado"],
-      ].map(([label, value])=>(
-        <div key={`forense-${label}`} style={{display:"flex",justifyContent:"space-between",gap:12,border:`1px solid ${T.b1}`,background:T.s2,borderRadius:10,padding:"9px 10px",fontSize:12}}>
-          <span style={{color:T.ts}}>{label}</span>
-          <strong style={{color:AC.claude}}>{value}</strong>
+    <div style={{display:"flex",flexDirection:"column",gap:16,maxHeight:"100%",overflowY:"auto",paddingBottom:20}}>
+      
+      {/* Secção 1: Diagnóstico Local */}
+      <div>
+        <h4 style={{fontSize:12,color:AC.gemini,marginTop:0,marginBottom:8,textTransform:"uppercase",letterSpacing:1.2,fontWeight:700}}>Diagnóstico de Sessão</h4>
+        <div style={{display:"flex",flexDirection:"column",gap:8}}>
+          {[
+            ["Mensagens Ativas", msgs.length],
+            ["Conversas no Histórico", conversations.length],
+            ["Fase da DAG atual", phase || "Ocioso (parado)"],
+            ["Lobos Ativos", MODELS.filter(m=>modelsOn[m.id]!==false).length],
+          ].map(([label, value])=>(
+            <div key={`forense-local-${label}`} style={{display:"flex",justifyContent:"space-between",gap:12,border:`1px solid ${T.b1}`,background:T.s2,borderRadius:10,padding:"8px 12px",fontSize:11}}>
+              <span style={{color:T.ts}}>{label}</span>
+              <strong style={{color:T.tx}}>{value}</strong>
+            </div>
+          ))}
         </div>
-      ))}
-      <button type="button" onClick={exportConv} style={{...btn(T,AC.gemini),width:"100%"}}>Exportar conversa actual</button>
+      </div>
+
+      {/* Secção 2: Estatísticas Supabase Vectoriais */}
+      <div>
+        <h4 style={{fontSize:12,color:AC.claude,marginTop:0,marginBottom:8,textTransform:"uppercase",letterSpacing:1.2,fontWeight:700}}>Memória Vectorial (Supabase)</h4>
+        {loadingForense ? (
+          <div style={{fontSize:11,color:T.ts,textAlign:"center",padding:16}}>A carregar dados do Supabase...</div>
+        ) : (
+          <div style={{display:"flex",flexDirection:"column",gap:8}}>
+            {[
+              ["Total de Vetores", supabaseStats ? `${supabaseStats.count} registos` : "0 registos"],
+              ["Última Gravação", supabaseStats?.lastUpdated ? new Date(supabaseStats.lastUpdated).toLocaleString("pt-PT") : "Nunca"],
+              ["Provider de Embeddings", supabaseStats?.provider || "Nenhum (Offline)"],
+              ["Latência RAG (Última Query)", ragLatency ? `${ragLatency} ms` : "N/A"],
+            ].map(([label, value])=>(
+              <div key={`forense-vector-${label}`} style={{display:"flex",justifyContent:"space-between",gap:12,border:`1px solid ${T.b1}`,background:T.s2,borderRadius:10,padding:"8px 12px",fontSize:11}}>
+                <span style={{color:T.ts}}>{label}</span>
+                <strong style={{color:AC.claude}}>{value}</strong>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Secção 3: Snippets de Memória Recentes */}
+      <div>
+        <h4 style={{fontSize:12,color:AC.reflex,marginTop:0,marginBottom:8,textTransform:"uppercase",letterSpacing:1.2,fontWeight:700}}>Últimos 5 Registos de Memória</h4>
+        {loadingForense ? (
+          <div style={{fontSize:11,color:T.ts,textAlign:"center",padding:16}}>A carregar...</div>
+        ) : recentMemories.length === 0 ? (
+          <div style={{fontSize:11,color:T.tf,textAlign:"center",padding:12,border:`1px dashed ${T.b1}`,borderRadius:10}}>Nenhum registo persistido no Supabase para este utilizador.</div>
+        ) : (
+          <div style={{display:"flex",flexDirection:"column",gap:8}}>
+            {recentMemories.map((mem) => {
+              const tipo = mem.metadata?.type || "semantic";
+              const dataStr = new Date(mem.created_at).toLocaleString("pt-PT", {
+                day: "numeric",
+                month: "short",
+                hour: "2-digit",
+                minute: "2-digit"
+              });
+              return (
+                <div key={`rec-mem-${mem.id}`} style={{border:`1px solid ${T.b1}`,background:T.s2,borderRadius:10,padding:10,fontSize:11,lineHeight:1.4}}>
+                  <div style={{display:"flex",justifyContent:"space-between",gap:8,marginBottom:4,fontSize:10}}>
+                    <span style={{color:tipo === "session_summary" ? AC.llama : AC.perp,fontWeight:700,textTransform:"uppercase"}}>{tipo}</span>
+                    <span style={{color:T.ts}}>{dataStr}</span>
+                  </div>
+                  <div style={{color:T.tx,wordBreak:"break-word"}}>{mem.content?.slice(0, 80)}...</div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Secção 4: Ações */}
+      <div style={{display:"flex",flexDirection:"column",gap:8,marginTop:8}}>
+        <button type="button" onClick={exportConv} style={{...btn(T,AC.gemini),width:"100%"}}>Exportar conversa atual (JSON)</button>
+        {userId && userId !== "anon" && (
+          <button 
+            type="button" 
+            onClick={apagarMemoriaVectorial} 
+            style={{...btn(T, AC.genspark), width:"100%", borderColor: "rgba(255, 107, 107, 0.4)", color: "#ff6b6b", background: "rgba(255, 107, 107, 0.08)"}}
+          >
+            🗑️ Apagar Histórico de Memória Vectorial (Supabase)
+          </button>
+        )}
+      </div>
+
     </div>
   </SidePanel>
 </>
