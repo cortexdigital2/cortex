@@ -53,3 +53,29 @@ describe("confidence badges", () => {
     });
   });
 });
+
+describe("fontes web verificadas", () => {
+  it("extrai fontes web da mensagem do Rei", async () => {
+    const { obterFontesWebMensagem } = await import("./cortex-digital.jsx");
+
+    expect(
+      obterFontesWebMensagem({
+        webSources: [{ title: "Fonte A", url: "https://a.pt", content: "Resumo" }],
+      })
+    ).toEqual([{ title: "Fonte A", url: "https://a.pt", content: "Resumo" }]);
+  });
+
+  it("ignora fontes sem título ou URL", async () => {
+    const { obterFontesWebMensagem } = await import("./cortex-digital.jsx");
+
+    expect(
+      obterFontesWebMensagem({
+        webSources: [
+          { title: "Fonte A", url: "https://a.pt" },
+          { title: "", url: "https://sem-titulo.pt" },
+          { title: "Sem URL", url: "" },
+        ],
+      })
+    ).toEqual([{ title: "Fonte A", url: "https://a.pt" }]);
+  });
+});

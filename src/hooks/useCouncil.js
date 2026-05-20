@@ -18,6 +18,7 @@ import { classifyError } from "../utils/errorMessages.js";
 import { GENERATION_STATES } from "../utils/generationStates.js";
 import { trimHistory, HISTORY_LIMIT } from "../utils/trimHistory.js";
 import { queryMemories } from "../lib/memory.js";
+import { formatTavilyContext, normalizarTavilyResults, tavilySearch } from "../lib/lib-tavily.js";
 import {
   buildMemoryEntry,
   saveMemoryEntry,
@@ -35,6 +36,41 @@ export const FASES_DAG = {
   CRITICA: "critica",
   SINTESE: "sintese",
 };
+
+const GROUNDING_KEYWORDS = ["quando", "quem", "qual", "onde", "quantos", "noticia", "hoje", "actual", "2024", "2025", "2026"];
+
+function normalizarTextoGrounding(texto) {
+  return String(texto || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+export function deveUsarGroundingWeb(pergunta) {
+  const texto = normalizarTextoGrounding(pergunta);
+  return GROUNDING_KEYWORDS.some((keyword) => texto.includes(keyword));
+}
+
+export async function obterGroundingWeb(pergunta, pesquisar = tavilySearch) {
+  if (!deveUsarGroundingWeb(pergunta)) return { contexto: "", webSources: [] };
+
+  try {
+    const dados = await pesquisar(pergunta, { maxResults: 3 });
+    const webSources = normalizarTavilyResults(dados?.results)
+      .slice(0, 3)
+      .map((fonte) => ({
+        ...fonte,
+        content: fonte.content.slice(0, 200),
+      }));
+
+    return {
+      contexto: formatTavilyContext({ results: webSources }),
+      webSources,
+    };
+  } catch {
+    return { contexto: "", webSources: [] };
+  }
+}
 
 function cacheGet(id, q) {
   const k = id + "::" + q;
@@ -479,6 +515,18 @@ export default function useCouncil(msgs, setMsgs) {
       });
     }
 
+    let webSources = [];
+    const groundingWeb = await obterGroundingWeb(q);
+    if (groundingWeb.contexto) {
+      webSources = groundingWeb.webSources;
+      messagesParaEnviar.push({
+        id: `web-grounding-${Date.now()}`,
+        role: "system",
+        content: groundingWeb.contexto,
+        systemNote: true,
+      });
+    }
+
     const frLevel = detectFrustration(nm);
     setFrustrationLevel(frLevel);
 
@@ -589,6 +637,7 @@ export default function useCouncil(msgs, setMsgs) {
         callClaude,
         signal: ctrlRei.signal,
       });
+      if (webSources.length > 0) resultadoRei = { ...resultadoRei, webSources };
       setKingResult(resultadoRei);
     } catch (e) {
       if (!devePararGeracao()) {
@@ -628,6 +677,7 @@ export default function useCouncil(msgs, setMsgs) {
         nextActions: resultadoRei.suggestions || [],
         confidence: `${resultadoRei.confianca_final}%`,
         king: resultadoRei,
+        webSources,
       };
     } else {
       setPhase(FASES_DAG.SINTESE);
@@ -693,6 +743,7 @@ export default function useCouncil(msgs, setMsgs) {
       graders,
       consensoMatematico: consenso,
       usedMemory: usedMem,
+      webSources,
       councilDecision: cDecision,
       refinedQuery: qFinal !== q ? qFinal : null,
     };

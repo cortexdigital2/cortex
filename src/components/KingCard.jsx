@@ -298,7 +298,11 @@ const KingCard = React.memo(function KingCard({
 
         <div style={{ paddingBottom: 4, borderBottom: `1px solid ${T.b1 || "var(--border)"}` }}>
           {PainelSinteseComponent ? (
-            <PainelSinteseComponent respostaBruta={textoPrincipal} confiancaFinal={king?.confianca_final} />
+            <PainelSinteseComponent
+              respostaBruta={textoPrincipal}
+              confiancaFinal={king?.confianca_final}
+              webSources={m.webSources || m.structured?.webSources || king?.webSources}
+            />
           ) : (
             <ChatBubble papel="rei" nome="Rei do Córtex" cor={accent} destaque>
               <Markdown text={textoPrincipal} color={T.tx || "var(--text-h)"} faint={T.ts || "var(--text)"} />

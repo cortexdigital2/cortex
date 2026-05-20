@@ -125,6 +125,22 @@ export function obterBadgeConfianca(confiancaFinal) {
   return { texto: "Baixa confiança", cor: "#ef4444", icone: "🔴" };
 }
 
+export function obterFontesWebMensagem(mensagem) {
+  const fontes = mensagem?.webSources || mensagem?.structured?.webSources || mensagem?.king?.webSources || [];
+  if (!Array.isArray(fontes)) return [];
+  return fontes
+    .map((fonte) => {
+      const content = String(fonte?.content || "").trim();
+      return {
+        title: String(fonte?.title || "").trim(),
+        url: String(fonte?.url || "").trim(),
+        ...(content ? { content } : {}),
+      };
+    })
+    .filter((fonte) => fonte.title && fonte.url)
+    .slice(0, 3);
+}
+
 function ConfidenceBadge({ confiancaFinal }) {
   const badge = obterBadgeConfianca(confiancaFinal);
   if (!badge) return null;
@@ -153,11 +169,50 @@ function ConfidenceBadge({ confiancaFinal }) {
   );
 }
 
-function PainelSinteseComConfianca({ respostaBruta, confiancaFinal }) {
+function FontesWebVerificadas({ webSources }) {
+  const fontes = obterFontesWebMensagem({ webSources });
+  if (!fontes.length) return null;
+
+  return (
+    <div
+      style={{
+        color: "var(--text-muted, var(--text, #8a8aa0))",
+        fontSize: 11,
+        lineHeight: 1.5,
+        display: "flex",
+        flexWrap: "wrap",
+        gap: 6,
+        alignItems: "center",
+      }}
+    >
+      <span>🌐 Fontes verificadas:</span>
+      {fontes.map((fonte, index) => (
+        <span key={`fonte-web-${fonte.url}-${index}`} style={{ display: "inline-flex", gap: 6 }}>
+          <a
+            href={fonte.url}
+            target="_blank"
+            rel="noreferrer"
+            style={{
+              color: "var(--accent, #10b981)",
+              textDecoration: "none",
+              fontWeight: 700,
+            }}
+          >
+            {fonte.title}
+          </a>
+          {index < fontes.length - 1 && <span aria-hidden="true">·</span>}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function PainelSinteseComConfianca({ respostaBruta, confiancaFinal, webSources }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
       <ConfidenceBadge confiancaFinal={confiancaFinal} />
       <PainelSintese respostaBruta={respostaBruta} />
+      <FontesWebVerificadas webSources={webSources} />
     </div>
   );
 }
